@@ -1,0 +1,54 @@
+{
+    "data": [
+        {
+            "description": "Check current stock balance",
+            "query": "SELECT * FROM stock_balance",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Monthly purchase summary",
+            "query": "SELECT DATE_TRUNC('month', credit_date) AS month, SUM(quantity * price_per_unit) AS total_purchase_value FROM stock_credit GROUP BY month ORDER BY month DESC;",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Medicine usage report",
+            "query": "SELECT m.name, SUM(sd.quantity) AS total_issued FROM stock_debit sd JOIN medicines m ON sd.medicine_id = m.id GROUP BY m.name ORDER BY total_issued DESC;",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Get full transaction history for a medicine",
+            "query": "SELECT 'CREDIT' AS type, sc.id, sc.quantity, sc.price_per_unit, sc.credit_date AS transaction_date, sc.note FROM stock_credit sc WHERE sc.medicine_id = 1 UNION SELECT 'DEBIT' AS type, sd.id, sd.quantity, NULL AS price_per_unit, sd.debit_date AS transaction_date, sd.note FROM stock_debit sd WHERE sd.medicine_id = 1 ORDER BY transaction_date;",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Low stock alert",
+            "query": "SELECT sb.medicine_id, sb.name, sb.balance FROM stock_balance sb WHERE sb.balance < 50 ORDER BY sb.balance ASC;",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Total stock value on hand",
+            "query": "SELECT m.name, (COALESCE(SUM(sc.quantity), 0) - COALESCE(SUM(sd.quantity), 0)) * MAX(sc.price_per_unit) AS current_stock_value FROM medicines m LEFT JOIN stock_credit sc ON sc.medicine_id = m.id LEFT JOIN stock_debit sd ON sd.medicine_id = m.id GROUP BY m.id, m.name;",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Top 5 most used medicines (by total debits)",
+            "query": "SELECT m.name, SUM(sd.quantity) AS total_issued FROM stock_debit sd JOIN medicines m ON m.id = sd.medicine_id GROUP BY m.id, m.name ORDER BY total_issued DESC LIMIT 5;",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Audit: Medicines with inconsistent stock (negative balance)",
+            "query": "SELECT * FROM stock_balance WHERE balance < 0;",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Get current stock & last transaction date for each medicine",
+            "query": "SELECT m.id, m.name, sb.balance, GREATEST(COALESCE((SELECT MAX(credit_date) FROM stock_credit WHERE medicine_id = m.id), '1970-01-01'), COALESCE((SELECT MAX(debit_date) FROM stock_debit WHERE medicine_id = m.id), '1970-01-01')) AS last_transaction FROM medicines m LEFT JOIN stock_balance sb ON m.id = sb.medicine_id;",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Medicines by category with total stock",
+            "query": "SELECT m.category, SUM(sb.balance) AS total_units_in_stock FROM stock_balance sb JOIN medicines m ON sb.medicine_id = m.id GROUP BY m.category ORDER BY total_units_in_stock DESC;",
+            "type": "SAMPLE_QUERY"
+        }
+    ]
+}

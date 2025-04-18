@@ -1,0 +1,28 @@
+{
+    "data": [
+        {
+            "name": "medicines",
+            "description": "Stores information about each medicine.",
+            "schema": "CREATE TABLE medicines (id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, brand VARCHAR(255), category VARCHAR(100), unit VARCHAR(50), -- e.g., \"tablet\", \"ml\", \"capsule\" created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW());",
+            "type": "TABLE"
+        },
+        {
+            "name": "stock_credit",
+            "description": "When stock is added (purchase or restock).",
+            "schema": "CREATE TABLE stock_credit (id SERIAL PRIMARY KEY, medicine_id INT REFERENCES medicines(id) ON DELETE CASCADE, quantity INT NOT NULL, price_per_unit NUMERIC(10, 2), credit_date DATE NOT NULL, note TEXT, created_at TIMESTAMP DEFAULT NOW());",
+            "type": "TABLE"
+        },
+        {
+            "name": "stock_debit",
+            "description": "When stock is consumed or sold.",
+            "schema": "CREATE TABLE stock_debit (id SERIAL PRIMARY KEY, medicine_id INT REFERENCES medicines(id) ON DELETE CASCADE, quantity INT NOT NULL, debit_date DATE NOT NULL, note TEXT, created_at TIMESTAMP DEFAULT NOW());",
+            "type": "TABLE"
+        },
+        {
+            "name": "stock_balance_view",
+            "description": "Not a table, but you can create this as a view to check current stock.",
+            "schema": "CREATE VIEW stock_balance AS SELECT m.id AS medicine_id, m.name, COALESCE(SUM(sc.quantity), 0) AS total_credit, COALESCE(SUM(sd.quantity), 0) AS total_debit, (COALESCE(SUM(sc.quantity), 0) - COALESCE(SUM(sd.quantity), 0)) AS balance FROM medicines m LEFT JOIN stock_credit sc ON sc.medicine_id = m.id LEFT JOIN stock_debit sd ON sd.medicine_id = m.id GROUP BY m.id, m.name;",
+            "type": "TABLE"
+        }
+    ]
+}
