@@ -43,6 +43,7 @@ def validate_sql_query(query: str) -> dict:
         if conn:
             conn.close()
 
+
 validate_sql_query_tool = FunctionTool(
     func=validate_sql_query,
 )
