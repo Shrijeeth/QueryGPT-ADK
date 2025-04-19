@@ -17,5 +17,5 @@ root_agent = LlmAgent(
     description=agent_description(version=1),
     instruction=agent_instruction(version=1),
     output_key="tables",
-    tools=[tools.get_similar_tables],
+    tools=[tools.get_similar_tables_tool],
 )

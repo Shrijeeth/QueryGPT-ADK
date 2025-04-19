@@ -1,4 +1,5 @@
 import json
+from google.adk.tools import FunctionTool
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchValue
 from litellm import embedding
@@ -52,3 +53,8 @@ def get_similar_queries(user_input: str, score_threshold: float = 0.7) -> str:
             "data": result,
         }
     )
+
+
+get_similar_queries_tool = FunctionTool(
+    func=get_similar_queries,
+)

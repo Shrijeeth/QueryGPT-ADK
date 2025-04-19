@@ -1,4 +1,5 @@
 import json
+from google.adk.tools import FunctionTool
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchValue
 from litellm import embedding
@@ -56,3 +57,8 @@ def get_similar_tables(
             "data": result,
         }
     )
+
+
+get_similar_tables_tool = FunctionTool(
+    func=get_similar_tables,
+)

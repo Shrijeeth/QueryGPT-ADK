@@ -17,5 +17,5 @@ root_agent = LlmAgent(
     description=agent_description(version=1),
     instruction=agent_instruction(version=1),
     output_key="query_explanation",
-    tools=[tools.get_similar_queries],
+    tools=[tools.get_similar_queries_tool],
 )
