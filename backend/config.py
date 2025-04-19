@@ -13,6 +13,11 @@ class Settings(BaseSettings):
     EMBEDDING_MODEL: str = ""
     EMBEDDING_API_KEY: str = ""
     EMBEDDING_SIZE: int = 768
+    VALIDATE_DB_HOST: str = ""
+    VALIDATE_DB_PORT: int = 3306
+    VALIDATE_DB_USER: str = ""
+    VALIDATE_DB_PASSWORD: str = ""
+    VALIDATE_DB_DATABASE: str = ""
 
     class Config:
         env_file = ".env" if os.getenv("ENVIRONMENT") != "test" else None

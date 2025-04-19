@@ -36,38 +36,24 @@ def agent_instruction(version: int):
                 4. Check if similar tables are available and relevant to user input.
                 5. Call `column_selection_agent` to get similar columns else retry the `column_selection_agent` for at least 2 to 3 times before returning empty array ([]).
                 6. Check if similar columns are available and relevant to user input.
-                7. If similar tables, columns and queries are available and relevant, combine the results from `query_explanation`, `table` and `selected_columns` session context and give the final output in below given format.
+                7. If similar tables, columns and queries are available and relevant, combine the results from `query_explanation`, `table` and `selected_columns` session context.
+                8. Call `query_formation_agent` to generate and validate SQL query. The result will be stored in `generated_query` session context.
+                9. If `generated_query` session context has error message, then try to run the workflow again from start by modifying user input and wrongly generated query as context.
+                10. If `generated_query` session context has no error message, then return the result in JSON format mentioned below.
 
             Final output must be in JSON Format:
                 - Once all have completed their workflows and tasks after calling sub agents and iterating, you will have the following:
                     - `query_explanation` session context: Contains the list of similar queries.
                     - `table` session context: Contains the list of similar tables.
                     - `selected_columns` session context: Contains the list of similar columns.
-                - Fetch corresponding query and table from `query_explanation` and `table` session context.
+                - Fetch corresponding query, table and columns from `query_explanation`, `table` and `selected_columns` session context.
                 - Strictly return responses using the following JSON structure (maintain format based on `type`):
                     ```json
-                    [
-                        {
-                            "description": "<description>",
-                            "query": "<query>",
-                            "explanation": "<explanation>",
-                            "type": "QUERY"
-                        },
-                        {
-                            "name": "<table_name>",
-                            "description": "<description>",
-                            "schema": "<table_schema>",
-                            "explanation": "<explanation>",
-                            "type": "TABLE"
-                        },
-                        {
-                            "name": "<column_name>",
-                            "table_name": "<table_name>",
-                            "explanation": "<explanation>",
-                            "type": "COLUMN"
-                        },
-                        ...
-                    ]
+                    {
+                        "generated_query": "<query>",
+                        "explanation": "<explanation>",
+                        "error": "<error>"
+                    }
                     ```
                 - Do not include commentary, markdown formatting, or surrounding text—just the raw JSON array.
             Try to run query_explanation agent, table agent and column_selection_agent.

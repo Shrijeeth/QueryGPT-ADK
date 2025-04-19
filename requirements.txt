@@ -9,3 +9,4 @@ streamlit==1.44.1
 ruff==0.11.6
 qdrant-client==1.13.3
 litellm==1.66.3
+mysql-connector-python==9.3.0

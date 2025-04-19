@@ -3,7 +3,12 @@ from google.adk.models.lite_llm import LiteLlm
 from google.adk.tools.agent_tool import AgentTool
 from config import get_settings
 from .prompts import agent_global_instruction, agent_instruction, agent_description
-from .sub_agents import query_explanation_agent, table_agent, column_selection_agent
+from .sub_agents import (
+    query_explanation_agent,
+    table_agent,
+    column_selection_agent,
+    query_formation_agent,
+)
 
 
 AGENT_MODEL = LiteLlm(
@@ -15,6 +20,7 @@ AGENT_MODEL = LiteLlm(
 query_explanation_agent_tool = AgentTool(query_explanation_agent)
 table_agent_tool = AgentTool(table_agent)
 column_selection_agent_tool = AgentTool(column_selection_agent)
+query_formation_agent_tool = AgentTool(query_formation_agent)
 
 
 root_agent = Agent(
@@ -27,5 +33,6 @@ root_agent = Agent(
         query_explanation_agent_tool,
         table_agent_tool,
         column_selection_agent_tool,
+        query_formation_agent_tool,
     ],
 )
