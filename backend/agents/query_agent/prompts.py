@@ -25,19 +25,26 @@ def agent_instruction(version: int):
                 2. Table Agent (table_agent):
                     - This agent helps in understanding the user's natural language input and similar queries for retrieving similar tables.
                     - Output from this agent is stored in `table` session context.
+                3. Column Selection Agent (column_selection_agent):
+                    - This agent helps in understanding the user's natural language input and similar queries and tables for retrieving similar columns.
+                    - Output from this agent is stored in `selected_columns` session context.
+
             **Workflow**:
-                1. Call `query_explanation_agent` to get similar queries else retry for at least 2 to 3 times before returning empty array ([]).
+                1. Call `query_explanation_agent` to get similar queries else retry the `query_explanation_agent` for at least 2 to 3 times before returning empty array ([]).
                 2. Check if similar queries are available and relevant to user input.
-                3. If similar queries are available and relevant, call `table_agent` to get similar tables else retry for at least 2 to 3 times before returning empty array ([]).
+                3. If similar queries are available and relevant, call `table_agent` to get similar tables else retry the `table_agent` for at least 2 to 3 times before returning empty array ([]).
                 4. Check if similar tables are available and relevant to user input.
-                5. If similar tables are available and relevant, combine the results from `query_explanation` and `table` session context and give the final output in below given format.
+                5. Call `column_selection_agent` to get similar columns else retry the `column_selection_agent` for at least 2 to 3 times before returning empty array ([]).
+                6. Check if similar columns are available and relevant to user input.
+                7. If similar tables, columns and queries are available and relevant, combine the results from `query_explanation`, `table` and `selected_columns` session context and give the final output in below given format.
 
             Final output must be in JSON Format:
                 - Once all have completed their workflows and tasks after calling sub agents and iterating, you will have the following:
                     - `query_explanation` session context: Contains the list of similar queries.
                     - `table` session context: Contains the list of similar tables.
+                    - `selected_columns` session context: Contains the list of similar columns.
                 - Fetch corresponding query and table from `query_explanation` and `table` session context.
-                - Strictly return responses using the following JSON structure:
+                - Strictly return responses using the following JSON structure (maintain format based on `type`):
                     ```json
                     [
                         {
@@ -53,11 +60,17 @@ def agent_instruction(version: int):
                             "explanation": "<explanation>",
                             "type": "TABLE"
                         },
+                        {
+                            "name": "<column_name>",
+                            "table_name": "<table_name>",
+                            "explanation": "<explanation>",
+                            "type": "COLUMN"
+                        },
                         ...
                     ]
                     ```
                 - Do not include commentary, markdown formatting, or surrounding text—just the raw JSON array.
-            Try to run query_explanation agent and then table agent.
+            Try to run query_explanation agent, table agent and column_selection_agent.
         """
     else:
         raise ValueError(f"Unknown prompt version: {version}")
