@@ -74,6 +74,65 @@ python scripts/add_table_schemas.py
 python scripts/add_sample_queries_qdrant.py
 ```
 
+6. (Optional) Use Your Own Data:
+
+To use QueryGPT-ADK with your own data, replace the provided `sample_queries.json` and `tables.json` files in the `backend/scripts/data/` directory with your own files. Make sure your files follow the same structure as the samples. Then, rerun the data loading scripts:
+
+```bash
+python scripts/add_table_schemas.py
+python scripts/add_sample_queries_qdrant.py
+```
+
+#### Data File Structure
+
+- **sample_queries.json**
+  - Contains a list of example queries for your database.
+  - Each entry should have a `description`, `query`, and `type`.
+  - Example:
+
+    ```json
+    {
+      "data": [
+        {
+          "description": "Check current stock balance",
+          "query": "SELECT * FROM stock_balance",
+          "type": "SAMPLE_QUERY"
+        },
+        {
+          "description": "Monthly purchase summary",
+          "query": "SELECT ...",
+          "type": "SAMPLE_QUERY"
+        }
+      ]
+    }
+    ```
+
+- **tables.json**
+  - Contains a list of tables (or views) and their schemas.
+  - Each entry should have a `name`, `description`, `schema`, and `type` (usually `TABLE`).
+  - Example:
+
+    ```json
+    {
+      "data": [
+        {
+          "name": "medicines",
+          "description": "Stores information about each medicine.",
+          "schema": "CREATE TABLE medicines (id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, ...);",
+          "type": "TABLE"
+        },
+        {
+          "name": "stock_credit",
+          "description": "When stock is added (purchase or restock).",
+          "schema": "CREATE TABLE stock_credit (id SERIAL PRIMARY KEY, ...);",
+          "type": "TABLE"
+        }
+      ]
+    }
+    ```
+
+Ensure your files follow the above structure for successful data loading and agent operation.
+
 ## Usage
 
 The application is designed to be integrated into a Google ADK or FastAPI or Streamlit app (frontend coming soon). You can interact with the agents programmatically or extend the project for your use case.
