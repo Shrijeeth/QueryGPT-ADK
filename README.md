@@ -189,12 +189,13 @@ The application is designed to be integrated into a Google ADK or FastAPI or Str
 - `query_explanation_agent`: Finds and explains similar queries related to the user input.
 - `table_agent`: Identifies relevant tables based on the user input.
 - `column_selection_agent`: Selects appropriate columns for the query.
-- `query_formation_agent`: Generates and validates SQL queries based on the user input and available tables and columns.
+- `query_formation_agent`: Generates SQL queries based on the user input and available tables and columns.
+- `query_validation_agent`: Validates the generated SQL queries for correctness and safety.
 
 ## Tools
 
 - `get_similar_queries_tool`: Retrieves similar queries from the Qdrant database based on the user input.
-- `get_table_tool`: Retrieves table names from the Qdrant database based on the user input.
+- `get_similar_tables_tool`: Retrieves similar tables from the Qdrant database based on the user input.
 - `validate_sql_query_tool`: Validates the generated SQL query.
 
 ## Demo
