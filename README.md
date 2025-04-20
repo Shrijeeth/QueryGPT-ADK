@@ -197,6 +197,12 @@ The application is designed to be integrated into a Google ADK or FastAPI or Str
 - `get_table_tool`: Retrieves table names from the Qdrant database based on the user input.
 - `validate_sql_query_tool`: Validates the generated SQL query.
 
+## Demo
+
+Watch the demo video below to see QueryGPT-ADK in action:
+
+[![Watch the demo](https://img.youtube.com/vi/CqprPES6tks/0.jpg)](https://youtu.be/CqprPES6tks)
+
 ## Contribution
 
 Contributions are welcome! Please open issues or submit pull requests for bug fixes, new features, or improvements.
