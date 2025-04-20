@@ -32,13 +32,13 @@ def validate_sql_query(query: str) -> dict:
         if query_type == "SELECT":
             try:
                 cursor.execute(f"EXPLAIN {query}")
-                return {"valid": True, "error": None}
+                return {"valid": "true", "error": ""}
             except Error as e:
-                return {"valid": False, "error": str(e)}
+                return {"valid": "false", "error": str(e)}
         else:
-            return {"valid": False, "error": "Only SELECT statements are allowed"}
+            return {"valid": "false", "error": "Only SELECT statements are allowed"}
     except Error as e:
-        return {"valid": False, "error": str(e)}
+        return {"valid": "false", "error": str(e)}
     finally:
         if conn:
             conn.close()

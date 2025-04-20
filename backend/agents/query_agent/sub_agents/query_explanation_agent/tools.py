@@ -6,7 +6,7 @@ from litellm import embedding
 from config import get_settings
 
 
-def get_similar_queries(user_input: str, score_threshold: float = 0.7) -> str:
+def get_similar_queries(user_input: str, score_threshold: float = 0.3) -> str:
     """
     Get similar queries for the given user input and score threshold
 

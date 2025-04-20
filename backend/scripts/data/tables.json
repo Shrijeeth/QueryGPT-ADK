@@ -19,7 +19,7 @@
             "type": "TABLE"
         },
         {
-            "name": "stock_balance_view",
+            "name": "stock_balance",
             "description": "Not a table, but you can create this as a view to check current stock.",
             "schema": "CREATE VIEW stock_balance AS SELECT m.id AS medicine_id, m.name, COALESCE(SUM(sc.quantity), 0) AS total_credit, COALESCE(SUM(sd.quantity), 0) AS total_debit, (COALESCE(SUM(sc.quantity), 0) - COALESCE(SUM(sd.quantity), 0)) AS balance FROM medicines m LEFT JOIN stock_credit sc ON sc.medicine_id = m.id LEFT JOIN stock_debit sd ON sd.medicine_id = m.id GROUP BY m.id, m.name;",
             "type": "TABLE"

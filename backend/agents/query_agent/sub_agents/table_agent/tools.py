@@ -7,7 +7,7 @@ from config import get_settings
 
 
 def get_similar_tables(
-    user_input: str, similar_queries: str, score_threshold: float = 0.7
+    user_input: str, similar_queries: str, score_threshold: float = 0.3
 ) -> str:
     """
     Get similar tables for the given user input and score threshold

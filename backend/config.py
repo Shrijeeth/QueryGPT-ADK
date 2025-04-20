@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     LLM_MODEL: str = "ollama/aya:8b"
     LLM_API_KEY: str = ""
+    LLM_TEMPERATURE: float = 0.2
     QDRANT_URL: str = ""
     QDRANT_API_KEY: str = ""
     QDRANT_COLLECTION_NAME: str = "querygpt"
