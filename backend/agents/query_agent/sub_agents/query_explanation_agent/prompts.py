@@ -91,7 +91,6 @@ def agent_instruction(version: int):
                     ]
                     ```
                 - Do not include commentary, markdown formatting, or surrounding text—just the raw JSON array.
-            5. Finally, transfer the flow to `query_agent` using the tool `transfer_to_agent`.
 
             **Example Workflow**:
                 User input: I need help with a query that filters products by price and category.
@@ -99,7 +98,6 @@ def agent_instruction(version: int):
                     - Call: `get_similar_queries("query that filters products by price and category", 0.3)`
                     - If no results: Lower threshold to 0.25 or rephrase to "SQL query filter product where price < X and category = Y"
                     - Call: `get_similar_queries("SQL query filter product where price < X and category = Y", 0.25)`
-                    - Call: `transfer_to_agent("query_agent")`
         """
     else:
         raise ValueError(f"Unknown prompt version: {version}")

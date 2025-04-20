@@ -95,7 +95,6 @@ def agent_instruction(version: int):
                     }
                     ```
                 - Do not include commentary, markdown formatting, or surrounding text—just the raw JSON array.
-            5. Finally, transfer the flow to `query_agent` using the tool `transfer_to_agent`.
 
         **Example Workflow**:
             User input: I need help with a query that joins orders and customers.
@@ -109,7 +108,6 @@ def agent_instruction(version: int):
                 Step-4: If only any one or two are found, set missing values to an empty string ("").
                 Step-5: If relevant queries, tables or columns are found, generate the SQL query based on the user input by considering the similar queries, tables and columns as reference.
                 Step-6: If the SQL query is valid, return the SQL query in the strict JSON format.
-                Step-7: Call: `transfer_to_agent("query_agent")`.
         """
     else:
         raise ValueError(f"Unknown prompt version: {version}")

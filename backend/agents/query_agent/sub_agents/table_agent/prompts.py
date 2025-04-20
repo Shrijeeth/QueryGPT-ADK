@@ -106,7 +106,6 @@ def agent_instruction(version: int):
                     ]
                     ```
                 - Do not include commentary, markdown formatting, or surrounding text—just the raw JSON array.
-            6. Finally, transfer the flow to `query_agent` using the tool `transfer_to_agent`.
 
             **Example Workflow**:
                 User input: I need help with a query that joins orders and customers.
@@ -117,7 +116,6 @@ def agent_instruction(version: int):
                     Step-3: Call: `get_similar_tables("query that joins orders and customers", '', 0.3)`
                     Step-4: If no results: Lower threshold to 0.25 or rephrase to "SQL query that joins orders and customers"
                     Step-5: Call: `get_similar_tables("SQL query that joins orders and customers", '["<sample query that joins orders and customers>", "<Sample SQL query that joins orders and customers>"]', 0.25)`
-                    Step-6: Call: `transfer_to_agent("query_agent")`
         """
     else:
         raise ValueError(f"Unknown prompt version: {version}")

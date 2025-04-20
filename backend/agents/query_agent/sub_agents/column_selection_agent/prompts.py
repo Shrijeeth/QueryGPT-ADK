@@ -87,7 +87,6 @@ def agent_instruction(version: int):
                     ]
                     ```
                 - Do not include commentary, markdown formatting, or surrounding text—just the raw JSON array.
-            6. Finally, transfer the flow to `query_agent` using the tool `transfer_to_agent`.
 
             **Example Workflow**:
                 User input: I need help with a query that joins orders and customers.
@@ -98,7 +97,6 @@ def agent_instruction(version: int):
                     Step-2: Analyse user input and similar queries (from `query_explanation`) and tables (from `tables`) to understand the intent.
                     Step-3: If no relevant columns are found, return an empty array ([]).
                     Step-4: If relevant columns are found, return the columns in the strict JSON format.
-                    Step-5: Call: `transfer_to_agent("query_agent")`.
         """
     else:
         raise ValueError(f"Unknown prompt version: {version}")
