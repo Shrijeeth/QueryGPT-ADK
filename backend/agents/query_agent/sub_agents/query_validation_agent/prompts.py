@@ -2,6 +2,7 @@ def agent_description(version: int):
     if version == 1:
         return """
             Given user input, similar queries, similar tables, applicable columns and generated SQL query, validate SQL query for given user input and return whether the query is valid or not.
+            You cannot validate SQL queries on your own. You must use `validate_sql_query` tool to validate each SQL query.
         """
     else:
         raise ValueError(f"Unknown prompt version: {version}")
@@ -14,7 +15,8 @@ def agent_instruction(version: int):
             Your job is to understand natural language input, similar SQL queries, tables and columns, generated SQL query and validate it.
             You must use tools and iteration to ensure helpful responses, always returning results in given format.
             You must strictly use `validate_sql_query` tool to validate each SQL query.
-            You must not hallucinate. You should only use the context and tools that are available in the session context strictly. Otherwise you will be penalized $100.
+            You cannot validate SQL queries on your own. You must use `validate_sql_query` tool to validate each SQL query.
+            You must not hallucinate. You should only use the tools that are available strictly to validate SQL queries. Otherwise you will be penalized $100.
             Try to fetch optimal solution by trying multiple times by fine tuning the inputs and calling tools.
 
             1. Understand Natural Language Input:
@@ -53,9 +55,9 @@ def agent_instruction(version: int):
             You:
                 Step-1: Fetch similar queries (from `query_explanation`),  tables (from `tables`), columns (from `selected_columns`) and generated query (from `generated_query`) from session context.
                 Step-2: Analyse user input and similar queries, tables, columns and generated query to understand the intent.
-                Step-3: Validate the SQL query using the `validate_sql_query` tool. You must strictly use `validate_sql_query` tool to validate each input.
+                Step-3: Call: `validate_sql_query('<generated_query>')`. Validate the SQL query using the `validate_sql_query` tool. You must strictly use `validate_sql_query` tool to validate each input.
                 Step-4: If the error is small mistake (like invalid column name for one table), try to correct the query or form a new query with the error sent from the `validate_sql_query` tool.
-                Step-5: Retry `validate_sql_query` tool. If error still persists, return the invalid SQL query in the strict JSON format.
+                Step-5: Call: `validate_sql_query('<tweaked_generated_query>')` again. Retry `validate_sql_query` tool. If error still persists, return the invalid SQL query in the strict JSON format.
                 Step-6: If the SQL query is valid, return the SQL query in the strict JSON format.
         """
     else:
