@@ -7,7 +7,7 @@
         },
         {
             "description": "Monthly purchase summary",
-            "query": "SELECT DATE_TRUNC('month', credit_date) AS month, SUM(quantity * price_per_unit) AS total_purchase_value FROM stock_credit GROUP BY month ORDER BY month DESC;",
+            "query": "SELECT DATE_FORMAT(credit_date, '%Y-%m-01') AS month, SUM(quantity * price_per_unit) AS total_purchase_value FROM stock_credit GROUP BY month ORDER BY month DESC;",
             "type": "SAMPLE_QUERY"
         },
         {
@@ -48,6 +48,66 @@
         {
             "description": "Medicines by category with total stock",
             "query": "SELECT m.category, SUM(sb.balance) AS total_units_in_stock FROM stock_balance sb JOIN medicines m ON sb.medicine_id = m.id GROUP BY m.category ORDER BY total_units_in_stock DESC;",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Monthly stock usage summary",
+            "query": "SELECT DATE_FORMAT(sd.debit_date, '%Y-%m-01') AS month, SUM(sd.quantity) AS total_issued FROM stock_debit sd GROUP BY month ORDER BY month DESC;",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Total sales value for each medicine (based on stock issued)",
+            "query": "SELECT m.name, SUM(sd.quantity * sc.price_per_unit) AS total_sales_value FROM stock_debit sd JOIN medicines m ON sd.medicine_id = m.id JOIN stock_credit sc ON sc.medicine_id = m.id GROUP BY m.id ORDER BY total_sales_value DESC;",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Stock purchased from a specific supplier",
+            "query": "SELECT m.name, SUM(sc.quantity) AS total_purchased, SUM(sc.quantity * sc.price_per_unit) AS total_purchase_value FROM stock_credit sc JOIN medicines m ON sc.medicine_id = m.id WHERE sc.supplier_id = 1 GROUP BY m.id ORDER BY total_purchased DESC;",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Average price per unit for a specific medicine",
+            "query": "SELECT m.name, AVG(sc.price_per_unit) AS avg_price_per_unit FROM stock_credit sc JOIN medicines m ON sc.medicine_id = m.id WHERE m.id = 1 GROUP BY m.id;",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Stock movement summary (credit + debit)",
+            "query": "SELECT m.name, COALESCE(SUM(sc.quantity), 0) - COALESCE(SUM(sd.quantity), 0) AS stock_movement FROM medicines m LEFT JOIN stock_credit sc ON m.id = sc.medicine_id LEFT JOIN stock_debit sd ON m.id = sd.medicine_id GROUP BY m.id ORDER BY stock_movement DESC;",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Total stock value for each medicine (considering both credit and debit)",
+            "query": "SELECT m.name, (COALESCE(SUM(sc.quantity), 0) - COALESCE(SUM(sd.quantity), 0)) * MAX(sc.price_per_unit) AS total_stock_value FROM medicines m LEFT JOIN stock_credit sc ON sc.medicine_id = m.id LEFT JOIN stock_debit sd ON sd.medicine_id = m.id GROUP BY m.id ORDER BY total_stock_value DESC;",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Supplier-wise stock purchase summary",
+            "query": "SELECT s.name AS supplier, SUM(sc.quantity) AS total_purchased, SUM(sc.quantity * sc.price_per_unit) AS total_purchase_value FROM stock_credit sc JOIN suppliers s ON sc.supplier_id = s.id GROUP BY s.id ORDER BY total_purchase_value DESC;",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Medicine issue summary by patient",
+            "query": "SELECT p.full_name AS patient_name, m.name AS medicine_name, SUM(mi.quantity) AS total_issued FROM medicine_issues mi JOIN patients p ON p.id = mi.patient_id JOIN medicines m ON m.id = mi.medicine_id GROUP BY p.id, m.id ORDER BY total_issued DESC;",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Average medicine issue quantity by patient",
+            "query": "SELECT p.full_name AS patient_name, AVG(mi.quantity) AS avg_quantity_issued FROM medicine_issues mi JOIN patients p ON p.id = mi.patient_id GROUP BY p.id ORDER BY avg_quantity_issued DESC;",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Most issued medicine for a specific patient",
+            "query": "SELECT m.name, SUM(mi.quantity) AS total_issued FROM medicine_issues mi JOIN medicines m ON m.id = mi.medicine_id WHERE mi.patient_id = 1 GROUP BY m.id ORDER BY total_issued DESC LIMIT 1;",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Total quantity of medicine issued by category",
+            "query": "SELECT m.category, SUM(mi.quantity) AS total_quantity_issued FROM medicine_issues mi JOIN medicines m ON mi.medicine_id = m.id GROUP BY m.category ORDER BY total_quantity_issued DESC;",
+            "type": "SAMPLE_QUERY"
+        },
+        {
+            "description": "Recent purchases for a specific supplier",
+            "query": "SELECT m.name, sc.quantity, sc.price_per_unit, sc.credit_date FROM stock_credit sc JOIN medicines m ON sc.medicine_id = m.id WHERE sc.supplier_id = 1 ORDER BY sc.credit_date DESC LIMIT 10;",
             "type": "SAMPLE_QUERY"
         }
     ]
