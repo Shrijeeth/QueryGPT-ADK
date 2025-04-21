@@ -1,13 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.future import select
 from datetime import timedelta
+from auth import get_password_hash
+from models import User as UserModel
 from auth import (
     authenticate_user,
     create_access_token,
     get_current_active_user,
     Token,
-    fake_users_db,
     ACCESS_TOKEN_EXPIRE_MINUTES,
 )
 from utils.helpers import parse_json_markdown
@@ -15,6 +18,8 @@ from agents.query_agent.agent import root_agent
 from google.adk import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
+from database import get_db
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 
@@ -24,8 +29,10 @@ class QueryRequest(BaseModel):
 
 
 @router.post("/token", response_model=Token)
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = authenticate_user(fake_users_db, form_data.username, form_data.password)
+async def login(
+    form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
+):
+    user = await authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -78,3 +85,38 @@ async def run_query(request: QueryRequest, user=Depends(get_current_active_user)
             status_code=400, detail="Failed to parse JSON response or invalid query"
         )
     return {"result": result}
+
+
+class UserCreate(BaseModel):
+    username: str
+    password: str
+    email: EmailStr | None = None
+    full_name: str | None = None
+
+
+@router.post("/register")
+async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
+    # Check if username or email already exists
+    existing = await db.execute(
+        select(UserModel).where(
+            (UserModel.username == user.username) | (UserModel.email == user.email)
+        )
+    )
+    if existing.scalars().first():
+        return {"error": "Username or email already exists."}
+
+    hashed_pw = get_password_hash(user.password)
+    new_user = UserModel(
+        username=user.username,
+        full_name=user.full_name,
+        email=user.email,
+        hashed_password=hashed_pw,
+        disabled=False,
+    )
+    db.add(new_user)
+    try:
+        await db.commit()
+    except IntegrityError:
+        await db.rollback()
+        return {"error": "Username or email already exists."}
+    return {"message": "User registered successfully"}

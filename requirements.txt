@@ -14,3 +14,5 @@ python-multipart==0.0.20
 python-jose==3.4.0
 bcrypt==4.0.1
 passlib[bcrypt]==1.7.4
+sqlalchemy[asyncio] ==2.0.40
+asyncpg==0.30.0

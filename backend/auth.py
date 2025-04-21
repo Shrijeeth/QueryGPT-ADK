@@ -3,9 +3,14 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from pydantic import BaseModel
 from passlib.context import CryptContext
+from sqlalchemy.future import select
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timedelta
 from typing import Optional
 from config import get_settings
+from models import User as UserModel
+from database import get_db
 
 # Secret key and algorithm for JWT
 SECRET_KEY = get_settings().JWT_SECRET_KEY
@@ -13,17 +18,6 @@ ALGORITHM = get_settings().JWT_ALGORITHM
 ACCESS_TOKEN_EXPIRE_MINUTES = get_settings().JWT_ACCESS_TOKEN_EXPIRE_MINUTES
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
-
-# Dummy user DB (replace with real DB in production)
-fake_users_db = {
-    "testuser": {
-        "username": "testuser",
-        "full_name": "Test User",
-        "email": "test@example.com",
-        "hashed_password": "$2b$12$qYvInIV06r0pkUjJ1Q9Dz.y54Kv7RXWnls9LcwcqibqrG4wmBLdZm",  # bcrypt for 'secret'
-        "disabled": False,
-    }
-}
 
 
 class Token(BaseModel):
@@ -57,14 +51,27 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def get_user(db, username: str):
-    if username in db:
-        user_dict = db[username]
-        return UserInDB(**user_dict)
+async def get_user(username: str, db: AsyncSession) -> UserInDB | None:
+    try:
+        result = await db.execute(
+            select(UserModel).where(UserModel.username == username)
+        )
+        user_obj = result.scalars().first()
+        if user_obj:
+            return UserInDB(
+                username=user_obj.username,
+                full_name=user_obj.full_name,
+                email=user_obj.email,
+                hashed_password=user_obj.hashed_password,
+                disabled=user_obj.disabled,
+            )
+        return None
+    except SQLAlchemyError:
+        return None
 
 
-def authenticate_user(db, username: str, password: str):
-    user = get_user(db, username)
+async def authenticate_user(username: str, password: str, db: AsyncSession):
+    user = await get_user(username, db)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -83,7 +90,9 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+async def get_current_user(
+    token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
+):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -97,7 +106,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    user = get_user(fake_users_db, username=token_data.username)
+    user = await get_user(token_data.username, db)
     if user is None:
         raise credentials_exception
     return user
