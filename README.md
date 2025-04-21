@@ -204,6 +204,49 @@ Watch the demo video below to see QueryGPT-ADK in action:
 
 [![Watch the demo](https://img.youtube.com/vi/CqprPES6tks/0.jpg)](https://youtu.be/CqprPES6tks)
 
+## Roadmap
+
+### Streamlit UI
+
+- Build a Streamlit app for natural-language-to-SQL interactions.
+- Provide a text input for user queries and display generated SQL queries.
+- Execute SQL queries and render results as interactive tables.
+- Add a sidebar for query history, filters, and parameter controls.
+- Utilize Streamlit caching and session state for performance and UX.
+
+### FastAPI Backend
+
+- Develop REST API endpoints for query submission, execution, and validation.
+- Implement CORS, rate limiting, and token-based authentication.
+- Establish database connectivity and connection pooling.
+- Provide interactive OpenAPI documentation via Swagger UI.
+- Write unit and integration tests for API endpoints.
+
+### BYOK & Model Provider Support
+
+- Add support for BYOK (Bring Your Own Key/Model) to allow users to plug in their preferred LLM provider (e.g., OpenAI, Gemini, Ollama, Azure, local models, etc.).
+- Provide a configuration interface for selecting and managing model providers.
+- Ensure compatibility with multiple model APIs and authentication mechanisms.
+- Add documentation and examples for integrating new model providers.
+
+### Importing Custom Databases
+
+- Build a flexible importer to support connecting and importing schemas from various custom databases (e.g., PostgreSQL, SQLite, Oracle, etc.).
+- Provide a UI and/or CLI for users to add new database connections.
+- Auto-detect and map table schemas and relationships from imported databases.
+- Validate and test queries on imported/custom databases.
+
+### Importing Custom Vector Databases
+
+- Add support for connecting to and importing from various vector databases (e.g., Pinecone, Weaviate, Milvus, Chroma, etc.).
+- Provide configuration and interface for users to add/manage vector DB connections.
+- Enable schema and collection import for semantic search and retrieval.
+- Ensure integration of custom vector DBs with agentic workflow and query tools.
+
+### Testing
+
+- Write test cases for agentic workflow (end-to-end and agent interaction tests).
+
 ## Contribution
 
 Contributions are welcome! Please open issues or submit pull requests for bug fixes, new features, or improvements.
