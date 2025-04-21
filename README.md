@@ -8,7 +8,8 @@ QueryGPT-ADK is an open-source, multi-agent system for natural language to SQL q
 - Multi-Agent Architecture: Modular agents for query formation, explanation, table/column selection, and validation.
 - Vector Search Integration: Uses Qdrant for semantic search over sample queries and table schemas.
 - Validation: Ensures only valid SELECT queries are generated and executed.
-- Extensible: Built with FastAPI, Pydantic, and Google ADK which supports easy addition of new agents and tools.
+- Extensible: Built with FastAPI, Pydantic, and Google ADK, supporting easy addition of new agents and tools.
+- LLM Provider Flexibility: Supports Gemini (default), Ollama, OpenAI, or any LLM provider by configuring environment variables in `.env`. See `.env.example` for details.
 - Sample Data: Includes sample queries and table schemas for demonstration and testing.
 
 ## Project Structure
@@ -35,7 +36,7 @@ QueryGPT-ADK/
 - [Python 3.9+](https://www.python.org/downloads/)
 - [MySQL database](https://www.mysql.com/) (for query validation)
 - [Qdrant](https://qdrant.tech/) vector database
-- (Optional) [Gemini](https://aistudio.google.com/) or [Ollama](https://ollama.com/) or any other LLM API
+- (Optional) [Gemini](https://aistudio.google.com/), [Ollama](https://ollama.com/), [OpenAI](https://platform.openai.com/), or any other LLM API (configurable via `.env`)
 
 ### Setup
 
@@ -135,7 +136,22 @@ Ensure your files follow the above structure for successful data loading and age
 
 ## Usage
 
-The application is designed to be integrated into a Google ADK or FastAPI or Streamlit app (frontend coming soon). You can interact with the agents programmatically or extend the project for your use case.
+The application is designed to be integrated into a Google ADK, FastAPI, or Streamlit app (frontend coming soon). You can interact with the agents programmatically or extend the project for your use case.
+
+### Authentication & API Usage
+
+- The `/query` endpoint requires a Bearer token for authentication. Obtain a token from `/token` using username/password (see `fake_users_db` in `auth.py` for default credentials).
+
+**Example: Obtain Token and Query (using curl)**
+
+```bash
+# Get access token
+curl -X POST "http://localhost:8000/token" -d "username=testuser&password=secret"
+# Use the returned access_token for authenticated query
+curl -X POST "http://localhost:8000/query" -H "Authorization: Bearer <access_token>" -H "Content-Type: application/json" -d '{"query": "Show me the top 5 medicines by usage"}'
+```
+
+### Launching ADK Web UI
 
 1. Launch the ADK Web UI
 
@@ -247,9 +263,9 @@ Watch the demo video below to see QueryGPT-ADK in action:
 
 - Write test cases for agentic workflow (end-to-end and agent interaction tests).
 
-## Contribution
+## Contribution & Extending Agents
 
-Contributions are welcome! Please open issues or submit pull requests for bug fixes, new features, or improvements.
+Contributions are welcome! The agent system is modular. New agents and tools can be added by following the existing pattern in `backend/agents/`. Please open issues or submit pull requests for bug fixes, new features, or improvements.
 
 1. Fork the repository.
 2. Create your feature branch (git checkout -b feature/your-feature).

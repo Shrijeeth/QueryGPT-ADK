@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     VALIDATE_DB_USER: str = ""
     VALIDATE_DB_PASSWORD: str = ""
     VALIDATE_DB_DATABASE: str = ""
+    JWT_SECRET_KEY: str = "supersecret"
+    JWT_ALGORITHM: str = "HS256"
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
     class Config:
         env_file = ".env" if os.getenv("ENVIRONMENT") != "test" else None
