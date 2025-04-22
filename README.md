@@ -8,7 +8,13 @@ QueryGPT-ADK is an open-source, multi-agent system for natural language to SQL q
 - Multi-Agent Architecture: Modular agents for query formation, explanation, table/column selection, and validation.
 - Vector Search Integration: Uses Qdrant for semantic search over sample queries and table schemas.
 - Validation: Ensures only valid SELECT queries are generated and executed.
-- Extensible: Built with FastAPI, Pydantic, and Google ADK, supporting easy addition of new agents and tools.
+- **Production-Ready Security:**
+  - Redis-backed rate limiting (per-IP, distributed)
+  - Account lockout after repeated failed logins (also Redis-backed)
+  - JWT authentication, password hashing, and best-practice error handling
+- **Extensible & Modular:**
+  - Models organized in `models/`, infra in `infra/`, and all middlewares in `middleware/`
+  - Easy to add new agents, tools, or infrastructure
 - LLM Provider Flexibility: Supports Gemini (default), Ollama, OpenAI, or any LLM provider by configuring environment variables in `.env`. See `.env.example` for details.
 - Sample Data: Includes sample queries and table schemas for demonstration and testing.
 
@@ -20,6 +26,9 @@ QueryGPT-ADK/
 │   ├── agents/           # Multi-agent system implementation
 │   ├── scripts/          # Data loading and utility scripts
 │   ├── utils/            # Utility modules
+│   ├── models/           # Modular SQLAlchemy models
+│   ├── infra/            # Infrastructure: database and Redis clients
+│   ├── middleware/       # Middlewares: rate limiting, account lockout
 │   ├── config.py         # Configuration and environment management
 │   ├── requirements.txt  # Python dependencies
 │   └── .env              # Environment variables
@@ -29,6 +38,11 @@ QueryGPT-ADK/
 └── .gitignore
 ```
 
+## Alembic Migrations, Linting, and Formatting
+
+- Database schema changes are managed using Alembic migrations. See `alembic/` for migration scripts.
+- Code is formatted and linted using `ruff`. Run `make lint` and `make format` to check and auto-fix code style.
+
 ## Installation
 
 ### Prerequisites
@@ -36,6 +50,7 @@ QueryGPT-ADK/
 - [Python 3.9+](https://www.python.org/downloads/)
 - [MySQL database](https://www.mysql.com/) (for query validation)
 - [Qdrant](https://qdrant.tech/) vector database
+- [Redis](https://redis.io/) (for rate limiting and account lockout)
 - (Optional) [Gemini](https://aistudio.google.com/), [Ollama](https://ollama.com/), [OpenAI](https://platform.openai.com/), or any other LLM API (configurable via `.env`)
 
 ### Setup
@@ -58,6 +73,13 @@ python -m pip install -r requirements.txt
 ```bash
 cd backend
 cp .env.example .env
+```
+
+Edit `.env` and set your database and Redis URLs as needed. Example:
+
+```text
+POSTGRES_DB_URL=postgresql+asyncpg://user:password@localhost:5432/querygpt
+REDIS_URL=redis://localhost:6379/1
 ```
 
 4. Clear Qdrant database (Optional):
