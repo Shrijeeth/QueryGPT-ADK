@@ -33,26 +33,6 @@ QueryGPT-ADK is an open-source, multi-agent system for natural language to SQL q
 - LLM Provider Flexibility: Supports Gemini (default), Ollama, OpenAI, or any LLM provider by configuring environment variables in `.env`. See `.env.example` for details.
 - Sample Data: Includes sample queries and table schemas for demonstration and testing.
 
-## Project Structure
-
-```text
-QueryGPT-ADK/
-├── backend/
-│   ├── agents/           # Multi-agent system implementation
-│   ├── scripts/          # Data loading and utility scripts
-│   ├── utils/            # Utility modules
-│   ├── models/           # Modular SQLAlchemy models
-│   ├── infra/            # Infrastructure: database and Redis clients
-│   ├── middleware/       # Middlewares: rate limiting, account lockout
-│   ├── config.py         # Configuration and environment management
-│   ├── requirements.txt  # Python dependencies
-│   └── .env              # Environment variables
-├── frontend/             # (Currently empty, for future UI)
-├── README.md
-├── Makefile
-└── .gitignore
-```
-
 ## Alembic Migrations, Linting, and Formatting
 
 - Database schema changes are managed using Alembic migrations. See `alembic/` for migration scripts.
@@ -80,6 +60,7 @@ cd QueryGPT-ADK
 2. Install dependencies:
 
 ```bash
+cd backend
 python -m pip install -r requirements.txt
 ```
 
@@ -97,7 +78,17 @@ POSTGRES_DB_URL=postgresql+asyncpg://user:password@localhost:5432/querygpt
 REDIS_URL=redis://localhost:6379/1
 ```
 
-4. Clear Qdrant database (Optional):
+4. Set up the Frontend (Next.js UI):
+
+```bash
+cd ../frontend
+npm install
+npm run dev
+```
+
+This will start the frontend at [http://localhost:3000](http://localhost:3000).
+
+5. Clear Qdrant database (Optional):
 
 ```bash
 cd backend
@@ -330,13 +321,14 @@ curl -X POST "http://localhost:8000/query" \
 
 ## Roadmap
 
-### Streamlit UI
+### Next.js UI
 
-- Build a Streamlit app for natural-language-to-SQL interactions.
-- Provide a text input for user queries and display generated SQL queries.
-- Execute SQL queries and render results as interactive tables.
-- Add a sidebar for query history, filters, and parameter controls.
-- Utilize Streamlit caching and session state for performance and UX.
+- Build a modern Next.js web app for natural-language-to-SQL interactions.
+- Provide a user-friendly interface for entering queries and viewing generated SQL and results.
+- Display results in interactive, filterable tables.
+- Add authentication, query history, and user profile management.
+- Integrate responsive design and accessibility best practices.
+- Enable seamless communication with the FastAPI backend via REST API.
 
 ### FastAPI Backend
 
