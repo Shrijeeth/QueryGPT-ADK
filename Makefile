@@ -12,3 +12,16 @@ upsert-data:
 
 run-backend:
 	cd backend && uvicorn main:app --port 8000
+
+# Alembic migration commands
+migrate:
+	cd backend && alembic revision --autogenerate -m "$(m)"
+
+upgrade:
+	cd backend && alembic upgrade head
+
+downgrade:
+	cd backend && alembic downgrade -1
+
+migrations:
+	cd backend && alembic history --verbose
