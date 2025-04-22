@@ -2,6 +2,21 @@
 
 QueryGPT-ADK is an open-source, multi-agent system for natural language to SQL query generation and explanation. It leverages LLMs and vector search to help users convert natural language questions into SQL queries, explain them, and validate them, making database analytics accessible to everyone.
 
+## 🚀 Demo
+
+*QueryGPT-ADK in action:*
+
+- Enter a natural language question (e.g., "Show me the top 5 medicines by usage")
+- Authenticate via registration/login
+- See the generated SQL, explanation, and results
+- Handles rate limiting, account lockout, and error responses
+
+➡️ **Watch the demo video below to see QueryGPT-ADK in action:**
+
+[![Watch the demo](https://img.youtube.com/vi/CqprPES6tks/0.jpg)](https://youtu.be/CqprPES6tks)
+
+➡️ **See [Usage Examples](#usage-examples) below for API calls and more!**
+
 ## Features
 
 - Natural Language to SQL: Converts user questions into SQL queries using LLM-based agents.
@@ -173,6 +188,83 @@ curl -X POST "http://localhost:8000/token" -d "username=testuser&password=secret
 curl -X POST "http://localhost:8000/query" -H "Authorization: Bearer <access_token>" -H "Content-Type: application/json" -d '{"query": "Show me the top 5 medicines by usage"}'
 ```
 
+## Usage Examples
+
+### 1. Register a New User
+
+```bash
+curl -X POST "http://localhost:8000/register" \
+  -H "Content-Type: application/json" \
+  -d '{"username": "alice", "password": "secret123", "email": "alice@example.com", "full_name": "Alice Smith"}'
+```
+
+### 2. Log In and Get a JWT Token
+
+```bash
+curl -X POST "http://localhost:8000/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=alice&password=secret123"
+# Response: {"access_token": "<JWT>", "token_type": "bearer"}
+```
+
+### 3. Run a Query (Authenticated)
+
+```bash
+curl -X POST "http://localhost:8000/query" \
+  -H "Authorization: Bearer <JWT>" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "Show me the top 5 medicines by usage"}'
+```
+
+### 4. Example Error Responses
+
+- **Rate Limit Exceeded:**
+
+  ```json
+  {"detail": "Too Many Requests"}
+  ```
+
+- **Account Lockout:**
+
+  ```json
+  {"detail": "Account locked due to too many failed login attempts. Try again in 299 seconds."}
+  ```
+
+- **Unauthorized:**
+
+  ```json
+  {"detail": "Incorrect username or password"}
+  ```
+
+### 5. Interactive API Docs
+
+- Visit [http://localhost:8000/docs](http://localhost:8000/docs) for Swagger UI (auto-generated, try endpoints in browser)
+
+### 6. Alembic Migrations & Linting
+
+- Generate a new migration after model changes:
+
+  ```bash
+  alembic revision --autogenerate -m "describe_change"
+  alembic upgrade head
+  ```
+
+- Lint and format code:
+
+  ```bash
+  make lint
+  make format
+  ```
+
+### 7. Running with Redis & Database
+
+- Make sure Redis and your database are running and accessible (see `.env` for connection strings).
+- For distributed deployments, Redis ensures rate limiting and lockout work across all app instances.
+
+### 8. API Extensibility
+
+- Add new endpoints, agents, or tools in `backend/` as needed. See `middleware/` and `infra/` for scalable patterns.
+
 ### Launching ADK Web UI
 
 1. Launch the ADK Web UI
@@ -236,12 +328,6 @@ curl -X POST "http://localhost:8000/query" -H "Authorization: Bearer <access_tok
 - `get_similar_tables_tool`: Retrieves similar tables from the Qdrant database based on the user input.
 - `validate_sql_query_tool`: Validates the generated SQL query.
 
-## Demo
-
-Watch the demo video below to see QueryGPT-ADK in action:
-
-[![Watch the demo](https://img.youtube.com/vi/CqprPES6tks/0.jpg)](https://youtu.be/CqprPES6tks)
-
 ## Roadmap
 
 ### Streamlit UI
@@ -302,8 +388,12 @@ This project is licensed under the MIT License. See the LICENSE file for details
 ## Acknowledgments
 
 - [Google ADK](https://github.com/google/adk-python)
+- [Redis](https://redis.io/)
+- [PostgreSQL](https://www.postgresql.org/)
 - [MySQL](https://www.mysql.com/)
 - [FastAPI](https://fastapi.tiangolo.com/)
 - [Qdrant](https://qdrant.tech/)
 - [Pydantic](https://docs.pydantic.dev/)
 - [LiteLLM](https://github.com/BerriAI/litellm)
+- [SQLAlchemy](https://www.sqlalchemy.org/)
+- [Alembic](https://alembic.sqlalchemy.org/)
