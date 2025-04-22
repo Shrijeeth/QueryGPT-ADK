@@ -1,3 +1,4 @@
+import time
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel, EmailStr
@@ -20,6 +21,11 @@ from google.adk.sessions import InMemorySessionService
 from google.genai import types
 from database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
+from middleware.account_lockout import (
+    is_account_locked,
+    record_failed_login,
+    reset_failed_logins,
+)
 
 router = APIRouter()
 
@@ -32,13 +38,23 @@ class QueryRequest(BaseModel):
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
 ):
+    # Account lockout check
+    locked, until = is_account_locked(form_data.username)
+    if locked:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Account locked due to too many failed login attempts. Try again in {int(until - time.time())} seconds.",
+        )
     user = await authenticate_user(form_data.username, form_data.password, db)
     if not user:
+        record_failed_login(form_data.username)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    # On successful login, reset failed attempts
+    reset_failed_logins(form_data.username)
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires

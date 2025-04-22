@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str = "supersecret"
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    REDIS_URL: str = "redis://localhost:6379/1"
 
     class Config:
         env_file = ".env" if os.getenv("ENVIRONMENT") != "test" else None
