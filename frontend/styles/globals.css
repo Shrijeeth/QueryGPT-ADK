@@ -1,0 +1,34 @@
+html, body {
+  min-height: 100vh;
+  min-width: 100vw;
+  width: 100vw;
+  background: var(--background-gradient);
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  transition: background 0.3s;
+}
+
+:root {
+  --background-gradient: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+  --card-bg: #fff;
+  --primary: #6366f1;
+  --primary-alt: #818cf8;
+  --heading: #3730a3;
+  --subtitle: #64748b;
+  --feature-card-shadow: 0 4px 24px rgba(60, 72, 100, 0.08);
+  --feature-card-hover-shadow: 0 8px 32px rgba(99, 102, 241, 0.14);
+  --button-text: #fff;
+}
+.dark {
+  --background-gradient: linear-gradient(135deg, #18181b 0%, #312e81 100%);
+  --card-bg: #232136;
+  --primary: #a5b4fc;
+  --primary-alt: #6366f1;
+  --heading: #a5b4fc;
+  --subtitle: #cbd5e1;
+  --feature-card-shadow: 0 4px 24px rgba(80, 80, 120, 0.18);
+  --feature-card-hover-shadow: 0 8px 32px rgba(120, 130, 241, 0.18);
+  --button-text: #fff;
+  color-scheme: dark;
+}
