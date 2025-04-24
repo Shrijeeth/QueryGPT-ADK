@@ -42,7 +42,7 @@ const Register: React.FC = () => {
           password: form.password,
           email: form.email,
           full_name: form.name
-        })
+        }),
       });
       if (res.ok) {
         setMessage("Registration successful! You can now log in.");
