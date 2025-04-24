@@ -138,7 +138,10 @@ const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({ dark }) => {
   );
 };
 
+import { useRouter } from "next/router";
+
 const Home: React.FC = () => {
+  const router = useRouter();
   const featuresRef = useRef<HTMLDivElement | null>(null);
   const [dark, setDark] = useState(false);
 
@@ -196,7 +199,11 @@ const Home: React.FC = () => {
             <button className={styles.cta} onClick={scrollToFeatures}>
               Explore Features ↓
             </button>
-            <button className={styles.cta} type="button">
+            <button
+              className={styles.cta}
+              type="button"
+              onClick={() => router.push('/register')}
+            >
               Get Started
             </button>
           </div>
