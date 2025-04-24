@@ -4,20 +4,21 @@ import ThemeToggle from "../components/ThemeToggle";
 import styles from "./index.module.css";
 import { useTheme } from "../context/ThemeContext";
 
-const Register: React.FC = () => {
+const Login: React.FC = () => {
   const { dark, setDark } = useTheme();
-  const router = useRouter();
-
-
   const [form, setForm] = useState({
-    name: "",
-    email: "",
     username: "",
     password: ""
   });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const router = useRouter();
+
+
+  // Store token in memory for this session only (best for SSR apps)
+  // If you need to access the token across pages, consider using React context or sessionStorage
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -26,25 +27,44 @@ const Register: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setMessage(null);
     setError(null);
+    setMessage(null);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/register`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/token`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "application/json"
+        },
+        body: new URLSearchParams({
+          grant_type: "password",
           username: form.username,
           password: form.password,
-          email: form.email,
-          full_name: form.name
-        }),
+          scope: "",
+          client_id: "",
+          client_secret: ""
+        }).toString(),
       });
       if (res.ok) {
-        setMessage("Registration successful! You can now log in.");
-        setForm({ name: "", email: "", username: "", password: "" });
+        const data = await res.json();
+        // Store token in sessionStorage (temporary, cleared on tab close)
+        if (data.access_token) {
+          sessionStorage.setItem("access_token", data.access_token);
+          setAccessToken(data.access_token);
+          setMessage("Login successful!");
+          setTimeout(() => router.push("/"), 1000); // Redirect after login
+        } else {
+          setError("No access token received.");
+        }
       } else {
         const data = await res.json().catch(() => ({}));
-        setError(data.detail || "Registration failed. Try again.");
+        if (data.detail) {
+          setError(data.detail);
+        } else if (Array.isArray(data) && data[0]?.msg) {
+          setError(data.map((e:any) => e.msg).join(" "));
+        } else {
+          setError("Login failed. Check credentials.");
+        }
       }
     } catch (err) {
       console.error(err);
@@ -74,7 +94,7 @@ const Register: React.FC = () => {
         <ThemeToggle dark={dark} setDark={setDark} />
       </div>
       <form
-        className={styles["register-form"]}
+        onSubmit={handleSubmit}
         style={{
           background: dark ? "#232136cc" : "#fff",
           color: dark ? "#f5f6fa" : "#232136",
@@ -91,45 +111,10 @@ const Register: React.FC = () => {
           flexDirection: "column",
           gap: "1.2rem",
         }}
-        onSubmit={handleSubmit}
       >
         <h2 style={{ textAlign: "center", marginBottom: "0.7rem", fontWeight: 700 }}>
-          Create your account
+          {dark ? "🌙 " : "☀️ "}Login
         </h2>
-        <input
-          name="name"
-          type="text"
-          placeholder="Name"
-          required
-          value={form.name}
-          onChange={handleChange}
-          style={{
-            padding: "0.8rem 1rem",
-            borderRadius: 8,
-            border: dark ? "1px solid #6366f1" : "1px solid #c7d2fe",
-            background: dark ? "#232136" : "#f4f6fb",
-            color: dark ? "#fff" : "#232136",
-            fontSize: 16,
-            outline: "none",
-          }}
-        />
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          required
-          value={form.email}
-          onChange={handleChange}
-          style={{
-            padding: "0.8rem 1rem",
-            borderRadius: 8,
-            border: dark ? "1px solid #6366f1" : "1px solid #c7d2fe",
-            background: dark ? "#232136" : "#f4f6fb",
-            color: dark ? "#fff" : "#232136",
-            fontSize: 16,
-            outline: "none",
-          }}
-        />
         <input
           name="username"
           type="text"
@@ -152,7 +137,6 @@ const Register: React.FC = () => {
           type="password"
           placeholder="Password"
           required
-          minLength={6}
           value={form.password}
           onChange={handleChange}
           style={{
@@ -167,22 +151,70 @@ const Register: React.FC = () => {
         />
         <button
           type="submit"
-          className={styles.cta}
-          style={{ width: "100%", marginTop: 8 }}
           disabled={loading}
+          style={{
+            padding: "0.9rem 0",
+            borderRadius: 8,
+            border: "none",
+            background:
+              "linear-gradient(90deg, #6366f1 0%, #3730a3 100%)",
+            color: "#fff",
+            fontWeight: 700,
+            fontSize: 17,
+            cursor: "pointer",
+            marginTop: "0.3rem",
+            marginBottom: "0.8rem",
+            boxShadow: dark
+              ? "0 2px 12px 0 rgba(99,102,241,0.18)"
+              : "0 2px 12px 0 rgba(99,102,241,0.08)",
+            transition: "background 0.2s, box-shadow 0.2s",
+          }}
         >
-          {loading ? "Registering..." : "Register"}
+          {loading ? "Logging in..." : "Login"}
         </button>
         {message && (
-          <div style={{ color: dark ? "#a5f3fc" : "#059669", textAlign: "center", fontSize: 15 }}>
+          <div
+            style={{
+              color: dark ? "#059669" : "#059669",
+              background: dark ? "#052e16" : "#ecfdf5",
+              borderRadius: 8,
+              padding: "0.6rem 1rem",
+              fontWeight: 600,
+              fontSize: 16,
+              textAlign: "center",
+            }}
+          >
             {message}
           </div>
         )}
-        {error && (
-          <div style={{ color: dark ? "#fda4af" : "#b91c1c", textAlign: "center", fontSize: 15 }}>
-            {error}
-          </div>
-        )}
+        {error != null && error !== "" && (() => {
+          const errVal = error as unknown;
+          const style = {
+            color: dark ? "#fde68a" : "#dc2626",
+            background: dark ? "#7f1d1d" : "#fef2f2",
+            borderRadius: 8,
+            padding: "0.6rem 1rem",
+            fontWeight: 600,
+            fontSize: 16,
+            textAlign: "center" as const,
+          };
+          if (Array.isArray(errVal)) {
+            return (
+              <div style={style}>
+                {errVal.map((e, i) =>
+                  typeof e === "object" && e && "msg" in e
+                    ? <div key={i}>{e.msg}</div>
+                    : <div key={i}>{String(e)}</div>
+                )}
+              </div>
+            );
+          } else if (typeof errVal === "object" && errVal && "msg" in errVal) {
+            return <div style={style}>{(errVal as any).msg}</div>;
+          } else {
+            return <div style={style}>{String(errVal)}</div>;
+          }
+        })()}
+
         <button
           type="button"
           style={{
@@ -201,6 +233,6 @@ const Register: React.FC = () => {
       </form>
     </div>
   );
-}
+};
 
-export default Register;
+export default Login;

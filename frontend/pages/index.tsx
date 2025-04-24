@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import styles from "./index.module.css";
 import ThemeToggle from "../components/ThemeToggle";
+import { useTheme } from "../context/ThemeContext";
 
 const features = [
   {
@@ -143,16 +144,8 @@ import { useRouter } from "next/router";
 const Home: React.FC = () => {
   const router = useRouter();
   const featuresRef = useRef<HTMLDivElement | null>(null);
-  const [dark, setDark] = useState(false);
+  const { dark, setDark } = useTheme();
 
-  // Sync 'dark' class on <body> for global theme
-  useEffect(() => {
-    if (dark) {
-      document.body.classList.add('dark');
-    } else {
-      document.body.classList.remove('dark');
-    }
-  }, [dark]);
 
   // Scroll to Features section
   const scrollToFeatures = () => {
@@ -195,17 +188,9 @@ const Home: React.FC = () => {
               <li>Handles rate limiting, account lockout, and error responses</li>
             </ul>
           </div>
-          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center', marginTop: '2rem' }}>
-            <button className={styles.cta} onClick={scrollToFeatures}>
-              Explore Features ↓
-            </button>
-            <button
-              className={styles.cta}
-              type="button"
-              onClick={() => router.push('/register')}
-            >
-              Get Started
-            </button>
+          <div className={styles['cta-buttons']}>
+            <a href="/login" className={styles.navBtn + ' ' + styles.signinBtn}>Sign In</a>
+            <a href="/register" className={styles.navBtn + ' ' + styles.signupBtn}>Sign Up</a>
           </div>
         </section>
         <div className={styles.divider} aria-hidden="true" />
