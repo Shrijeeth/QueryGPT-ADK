@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import ThemeToggle from "../components/ThemeToggle";
+
 import styles from "./index.module.css";
+
 import { useTheme } from "../context/ThemeContext";
 
 const Login: React.FC = () => {
@@ -52,7 +54,7 @@ const Login: React.FC = () => {
           sessionStorage.setItem("access_token", data.access_token);
           setAccessToken(data.access_token);
           setMessage("Login successful!");
-          setTimeout(() => router.push("/"), 1000); // Redirect after login
+          router.push("/dashboard");
         } else {
           setError("No access token received.");
         }
@@ -75,22 +77,24 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div
-      className={styles.container}
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background:
-          dark
-            ? "radial-gradient(ellipse 80% 60% at 50% 0%, #232136 0%, #181825 100%)"
-            : "linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)",
-        transition: "background 0.3s",
-        position: "relative",
-      }}
-    >
-      <div style={{ position: "absolute", top: 24, right: 32, zIndex: 10 }}>
+    <div style={{
+      minHeight: '100vh',
+      width: '100vw',
+      background: dark ? 'linear-gradient(135deg, #181825 0%, #232136 100%)' : 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)',
+      fontFamily: 'Inter, ui-sans-serif, system-ui',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
+      {/* Theme toggle at top right */}
+      <div style={{
+        position: 'absolute',
+        top: 32,
+        right: 36,
+        zIndex: 10
+      }}>
         <ThemeToggle dark={dark} setDark={setDark} />
       </div>
       <form

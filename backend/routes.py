@@ -1,9 +1,10 @@
 import time
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.future import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import timedelta
 from auth import get_password_hash
 from models import User as UserModel
@@ -32,6 +33,13 @@ router = APIRouter()
 
 class QueryRequest(BaseModel):
     query: str
+
+
+
+@router.get("/validate-token")
+async def validate_token(request: Request, db: AsyncSession = Depends(get_db), user=Depends(get_current_active_user)):
+    # If get_current_user does not raise, token is valid
+    return {"valid": True, "username": user.username, "email": user.email}
 
 
 @router.post("/token", response_model=Token)
