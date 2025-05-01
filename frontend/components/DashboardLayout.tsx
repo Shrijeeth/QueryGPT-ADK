@@ -124,6 +124,48 @@ const DashboardLayout: React.FC<{
   children: React.ReactNode;
 }> = ({ selected, onSelect, children }) => {
   const { dark } = useTheme();
+
+  // Profile popover state/hooks
+  const [showProfile, setShowProfile] = React.useState(false);
+  const [profile, setProfile] = React.useState<{ username: string; email: string }>({ username: '', email: '' });
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState('');
+  const profileRef = React.useRef<HTMLDivElement>(null);
+  const firstLetter = profile.username ? profile.username[0].toUpperCase() : 'U';
+
+  React.useEffect(() => {
+    async function fetchProfile() {
+      setLoading(true);
+      setError('');
+      try {
+        const token = typeof window !== 'undefined' ? window.sessionStorage.getItem('access_token') : null;
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/profile`, {
+          headers: { 'Authorization': token ? `Bearer ${token}` : '' },
+        });
+        if (!res.ok) throw new Error('Failed to fetch profile');
+        const data = await res.json();
+        setProfile({ username: data.username || '', email: data.email || '' });
+      } catch (err: any) {
+        setError(err.message || 'Error fetching profile');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProfile();
+  }, []);
+
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setShowProfile(false);
+      }
+    }
+    if (showProfile) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showProfile]);
+
   return (
     <div style={{ display: "flex" }}>
       <Sidebar selected={selected} onSelect={onSelect} />
@@ -164,27 +206,58 @@ const DashboardLayout: React.FC<{
             gap: 12,
             zIndex: 10
           }}>
-            <div style={{
-              width: 44,
-              height: 44,
-              borderRadius: '50%',
-              background: dark ? 'linear-gradient(135deg,#6366f1 0%,#818cf8 100%)' : 'linear-gradient(135deg,#818cf8 0%,#6366f1 100%)',
-              color: '#fff',
-              fontWeight: 800,
-              fontSize: 20,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 2px 10px #6366f155',
-              border: dark ? '2.5px solid #232136' : '2.5px solid #fff',
-              letterSpacing: 1,
-              userSelect: 'none',
-              textShadow: '0 1px 6px #23213644',
-            }}>
-              {/* Try to get initials from username/email if available */}
-              {typeof window !== 'undefined' && window.sessionStorage.getItem('user')
-                ? JSON.parse(window.sessionStorage.getItem('user') || '{}').username?.slice(0,2).toUpperCase() || 'U'
-                : 'U'}
+            {/* User Avatar Button and Popover (hooks moved to top-level) */}
+            <div ref={profileRef} style={{ position: 'relative' }}>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: '50%',
+                  background: dark ? 'linear-gradient(135deg,#6366f1 0%,#818cf8 100%)' : 'linear-gradient(135deg,#818cf8 0%,#6366f1 100%)',
+                  color: '#fff',
+                  fontWeight: 800,
+                  fontSize: 20,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 10px #6366f155',
+                  border: dark ? '2.5px solid #232136' : '2.5px solid #fff',
+                  letterSpacing: 1,
+                  userSelect: 'none',
+                  textShadow: '0 1px 6px #23213644',
+                  cursor: 'pointer',
+                }}
+                onClick={() => setShowProfile(p => !p)}
+                title="Show profile"
+              >
+                {firstLetter}
+              </div>
+              {showProfile && (
+                <div style={{
+                  position: 'absolute',
+                  top: 54,
+                  right: 0,
+                  background: dark ? '#232136' : '#fff',
+                  color: dark ? '#fff' : '#232136',
+                  borderRadius: 10,
+                  boxShadow: '0 2px 18px #23213633',
+                  padding: '18px 28px',
+                  minWidth: 210,
+                  zIndex: 100,
+                  border: dark ? '1.5px solid #6366f1' : '1.5px solid #818cf8',
+                }}>
+                  {loading ? (
+                    <div>Loading...</div>
+                  ) : error ? (
+                    <div style={{ color: 'red' }}>{error}</div>
+                  ) : (
+                    <>
+                      <div style={{ fontWeight: 700, fontSize: 18 }}>{profile.username || 'Unknown User'}</div>
+                      <div style={{ fontSize: 14, marginTop: 4, opacity: 0.8 }}>{profile.email || 'No email found'}</div>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           </div>
           {children}

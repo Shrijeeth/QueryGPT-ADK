@@ -182,7 +182,7 @@ const Home: React.FC = () => {
               QueryGPT-ADK leverages LLMs and vector search to help users convert natural language questions into SQL queries, explain them, and validate them—making database analytics accessible to everyone.
             </p>
             <ul>
-              <li>Enter a natural language question (e.g., "Show me the top 5 medicines by usage")</li>
+              <li>Enter a natural language question (e.g., &quot;Show me the top 5 medicines by usage&quot;)</li>
               <li>Authenticate via registration/login</li>
               <li>See the generated SQL, explanation, and results</li>
               <li>Handles rate limiting, account lockout, and error responses</li>

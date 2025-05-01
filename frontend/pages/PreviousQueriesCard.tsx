@@ -26,6 +26,7 @@ const cardBaseStyle = {
 const PreviousQueriesCard: React.FC = () => {
   const [queries, setQueries] = useState<QueryItem[]>([]);
   const { dark } = useTheme();
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const stored = sessionStorage.getItem("previous_queries");
@@ -65,22 +66,19 @@ const PreviousQueriesCard: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-      {queries.slice(0, 10).map((item, i) => {
-        const [hover, setHover] = useState(false);
-        return (
-          <div
-            key={i}
-            style={getCardStyle(hover)}
-            onMouseEnter={() => setHover(true)}
-            onMouseLeave={() => setHover(false)}
-          >
-            <div style={{ fontWeight: 700, fontSize: 17, marginBottom: 3, color: dark ? '#c7d2fe' : '#232136' }}>
-              {item.query}
-            </div>
-            <div style={{ color: '#818cf8', fontSize: 13 }}>{formatDate(item.timestamp)}</div>
+      {queries.slice(0, 10).map((item, i) => (
+        <div
+          key={i}
+          style={getCardStyle(hoveredIndex === i)}
+          onMouseEnter={() => setHoveredIndex(i)}
+          onMouseLeave={() => setHoveredIndex(null)}
+        >
+          <div style={{ fontWeight: 700, fontSize: 17, marginBottom: 3, color: dark ? '#c7d2fe' : '#232136' }}>
+            {item.query}
           </div>
-        );
-      })}
+          <div style={{ color: '#818cf8', fontSize: 13 }}>{formatDate(item.timestamp)}</div>
+        </div>
+      ))}
     </div>
   );
 };

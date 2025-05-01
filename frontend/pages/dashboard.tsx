@@ -56,10 +56,8 @@ const Dashboard: React.FC = () => {
             color: '#6366f1',
             textShadow: '0 2px 12px #6366f133'
           }}>
-            Welcome to your Dashboard, <span style={{ color: '#181825' }}>{user.username}</span>!
+            Welcome to your Dashboard, <span>{user.username}</span>!
           </h1>
-          {/* User Info Card */}
-          <UserInfoCard user={user} />
           {/* Previous Queries Section */}
           <div style={{ marginTop: 30, width: '100%' }}>
             <h3 style={{ fontWeight: 700, fontSize: 22, color: '#6366f1', marginBottom: 12, letterSpacing: 0.1 }}>Previous Queries</h3>

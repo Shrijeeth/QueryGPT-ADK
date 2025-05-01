@@ -144,3 +144,8 @@ async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
         await db.rollback()
         return {"error": "Username or email already exists."}
     return {"message": "User registered successfully"}
+
+
+@router.get("/profile")
+async def profile(user=Depends(get_current_active_user)):
+    return {"username": user.username, "email": user.email}
