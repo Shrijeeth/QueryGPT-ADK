@@ -21,7 +21,6 @@ from google.adk import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
 from database import get_db
-from sqlalchemy.ext.asyncio import AsyncSession
 from middleware.account_lockout import (
     is_account_locked,
     record_failed_login,
