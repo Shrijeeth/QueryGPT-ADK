@@ -30,28 +30,12 @@ QueryGPT-ADK is an open-source, multi-agent system for natural language to SQL q
 - **Extensible & Modular:**
   - Models organized in `models/`, infra in `infra/`, and all middlewares in `middleware/`
   - Easy to add new agents, tools, or infrastructure
+- **Next.js UI:**
+  - Built with Next.js and TypeScript
+  - Provides a user-friendly interface for entering queries and viewing generated SQL and results
+  - Interactive UI for entering and submitting natural language queries to various databases.
 - LLM Provider Flexibility: Supports Gemini (default), Ollama, OpenAI, or any LLM provider by configuring environment variables in `.env`. See `.env.example` for details.
 - Sample Data: Includes sample queries and table schemas for demonstration and testing.
-
-## Project Structure
-
-```text
-QueryGPT-ADK/
-├── backend/
-│   ├── agents/           # Multi-agent system implementation
-│   ├── scripts/          # Data loading and utility scripts
-│   ├── utils/            # Utility modules
-│   ├── models/           # Modular SQLAlchemy models
-│   ├── infra/            # Infrastructure: database and Redis clients
-│   ├── middleware/       # Middlewares: rate limiting, account lockout
-│   ├── config.py         # Configuration and environment management
-│   ├── requirements.txt  # Python dependencies
-│   └── .env              # Environment variables
-├── frontend/             # (Currently empty, for future UI)
-├── README.md
-├── Makefile
-└── .gitignore
-```
 
 ## Alembic Migrations, Linting, and Formatting
 
@@ -66,6 +50,8 @@ QueryGPT-ADK/
 - [MySQL database](https://www.mysql.com/) (for query validation)
 - [Qdrant](https://qdrant.tech/) vector database
 - [Redis](https://redis.io/) (for rate limiting and account lockout)
+- [Next.js](https://nextjs.org/) (for UI)
+- [TypeScript](https://www.typescriptlang.org/) (for UI)
 - (Optional) [Gemini](https://aistudio.google.com/), [Ollama](https://ollama.com/), [OpenAI](https://platform.openai.com/), or any other LLM API (configurable via `.env`)
 
 ### Setup
@@ -77,13 +63,14 @@ git clone https://github.com/Shrijeeth/QueryGPT-ADK.git
 cd QueryGPT-ADK
 ```
 
-2. Install dependencies:
+2. Install dependencies (Backend):
 
 ```bash
+cd backend
 python -m pip install -r requirements.txt
 ```
 
-3. Set up environment variables:
+3. Set up environment variables (Backend):
 
 ```bash
 cd backend
@@ -97,14 +84,38 @@ POSTGRES_DB_URL=postgresql+asyncpg://user:password@localhost:5432/querygpt
 REDIS_URL=redis://localhost:6379/1
 ```
 
-4. Clear Qdrant database (Optional):
+4. Set up environment variables (Frontend):
+
+```bash
+cd frontend
+cp .env.example .env
+```
+
+Edit `.env` and set your API base URL as needed. Example:
+
+```text
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+```
+
+5. Set up the Frontend (Next.js UI):
+
+```bash
+cd frontend
+npm install
+npm run build
+npm run dev
+```
+
+This will start the frontend at [http://localhost:3000](http://localhost:3000).
+
+6. Clear Qdrant database (Optional):
 
 ```bash
 cd backend
 python scripts/clear_vector_db.py
 ```
 
-5. Load db data into Qdrant:
+7. Load db data into Qdrant:
 
 ```bash
 cd backend
@@ -112,7 +123,7 @@ python scripts/add_table_schemas.py
 python scripts/add_sample_queries_qdrant.py
 ```
 
-6. (Optional) Use Your Own Data:
+8. (Optional) Use Your Own Data:
 
 To use QueryGPT-ADK with your own data, replace the provided `sample_queries.json` and `tables.json` files in the `backend/scripts/data/` directory with your own files. Make sure your files follow the same structure as the samples. Then, rerun the data loading scripts:
 
@@ -330,13 +341,14 @@ curl -X POST "http://localhost:8000/query" \
 
 ## Roadmap
 
-### Streamlit UI
+### Next.js UI
 
-- Build a Streamlit app for natural-language-to-SQL interactions.
-- Provide a text input for user queries and display generated SQL queries.
-- Execute SQL queries and render results as interactive tables.
-- Add a sidebar for query history, filters, and parameter controls.
-- Utilize Streamlit caching and session state for performance and UX.
+- Build a modern Next.js web app for natural-language-to-SQL interactions.
+- Provide a user-friendly interface for entering queries and viewing generated SQL and results.
+- Display results in interactive, filterable tables.
+- Add authentication, query history, and user profile management.
+- Integrate responsive design and accessibility best practices.
+- Enable seamless communication with the FastAPI backend via REST API.
 
 ### FastAPI Backend
 

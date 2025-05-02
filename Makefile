@@ -13,6 +13,9 @@ upsert-data:
 run-backend:
 	cd backend && uvicorn main:app --port 8000
 
+run-frontend:
+	cd frontend && npm run dev
+
 # Alembic migration commands
 migrate:
 	cd backend && alembic revision --autogenerate -m "$(m)"
