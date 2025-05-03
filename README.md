@@ -409,3 +409,5 @@ This project is licensed under the MIT License. See the LICENSE file for details
 - [LiteLLM](https://github.com/BerriAI/litellm)
 - [SQLAlchemy](https://www.sqlalchemy.org/)
 - [Alembic](https://alembic.sqlalchemy.org/)
+- [Next.js](https://nextjs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
