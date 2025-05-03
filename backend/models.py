@@ -1,2 +1,2 @@
 # Deprecated: models have moved to models/ package
-from models import User, Base  # noqa: F401
+from models import Base, User  # noqa: F401

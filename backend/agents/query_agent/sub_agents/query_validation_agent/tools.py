@@ -1,7 +1,7 @@
 import mysql.connector
-from mysql.connector import Error
-from google.adk.tools import FunctionTool
 from config import get_settings
+from google.adk.tools import FunctionTool
+from mysql.connector import Error
 
 
 def validate_sql_query(query: str) -> dict:

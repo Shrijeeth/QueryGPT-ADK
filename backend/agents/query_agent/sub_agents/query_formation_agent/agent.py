@@ -1,9 +1,9 @@
-from google.adk.agents import LlmAgent
-from google.genai import types
-from google.adk.models.lite_llm import LiteLlm
 from config import get_settings
-from .prompts import agent_description, agent_instruction
+from google.adk.agents import LlmAgent
+from google.adk.models.lite_llm import LiteLlm
+from google.genai import types
 
+from .prompts import agent_description, agent_instruction
 
 AGENT_MODEL = LiteLlm(
     model=get_settings().LLM_MODEL,

@@ -1,16 +1,17 @@
+from datetime import datetime, timedelta
+from typing import Optional
+
+from config import get_settings
+from database import get_db
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from pydantic import BaseModel
+from models import User as UserModel
 from passlib.context import CryptContext
-from sqlalchemy.future import select
+from pydantic import BaseModel
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
-from datetime import datetime, timedelta
-from typing import Optional
-from config import get_settings
-from models import User as UserModel
-from database import get_db
+from sqlalchemy.future import select
 
 # Secret key and algorithm for JWT
 SECRET_KEY = get_settings().JWT_SECRET_KEY
@@ -30,6 +31,7 @@ class TokenData(BaseModel):
 
 
 class User(BaseModel):
+    id: int
     username: str
     full_name: Optional[str] = None
     email: Optional[str] = None
@@ -59,6 +61,7 @@ async def get_user(username: str, db: AsyncSession) -> UserInDB | None:
         user_obj = result.scalars().first()
         if user_obj:
             return UserInDB(
+                id=user_obj.id,
                 username=user_obj.username,
                 full_name=user_obj.full_name,
                 email=user_obj.email,

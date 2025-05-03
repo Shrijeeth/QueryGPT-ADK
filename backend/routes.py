@@ -1,42 +1,125 @@
 import time
-from fastapi import APIRouter, Depends, HTTPException, status, Request
-from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import BaseModel, EmailStr
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.future import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import timedelta
-from auth import get_password_hash
-from models import User as UserModel
+
+from agents.query_agent.agent import root_agent
 from auth import (
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    Token,
     authenticate_user,
     create_access_token,
     get_current_active_user,
-    Token,
-    ACCESS_TOKEN_EXPIRE_MINUTES,
+    get_password_hash,
 )
-from utils.helpers import parse_json_markdown
-from agents.query_agent.agent import root_agent
+from database import get_db
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.security import OAuth2PasswordRequestForm
 from google.adk import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
-from database import get_db
+from infra.redis import redis_client
+from infra.vault import encrypt_api_data
 from middleware.account_lockout import (
     is_account_locked,
     record_failed_login,
     reset_failed_logins,
 )
+from models import LLMCredential
+from models import User as UserModel
+from pydantic import BaseModel, EmailStr
+from schemas.llm_credential_schemas import (
+    LLMCredentialCreate,
+    LLMCredentialOut,
+    LLMCredentialResponse,
+)
+from schemas.query_schemas import QueryRequest
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from utils.helpers import parse_json_markdown
+from utils.types import LLMProviders
 
 router = APIRouter()
 
 
-class QueryRequest(BaseModel):
-    query: str
+# Helper to get Redis key for selected credential per user
+async def get_selected_credential_id(username: str) -> int | None:
+    key = f"user:{username}:selected_llm_credential"
+    value = await redis_client.get(key)
+    return int(value) if value else None
 
+
+async def set_selected_credential_id(username: str, cred_id: int):
+    key = f"user:{username}:selected_llm_credential"
+    await redis_client.set(key, cred_id)
+
+
+@router.post("/llm-credentials", response_model=LLMCredentialResponse)
+async def add_llm_credential(
+    cred: LLMCredentialCreate,
+    user=Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+):
+    encrypted_api_key_response = await encrypt_api_data(cred.api_key)
+    encrypted_api_key = encrypted_api_key_response.get("data", {}).get(
+        "ciphertext", None
+    )
+    if not encrypted_api_key:
+        raise HTTPException(status_code=500, detail="Failed to encrypt API key")
+    new_cred = LLMCredential(
+        user_id=user.id,
+        api_key=encrypted_api_key,
+        provider=cred.provider.value,
+        label=cred.label,
+    )
+    db.add(new_cred)
+    await db.commit()
+    await db.refresh(new_cred)
+    return {
+        "success": True,
+        "message": "LLM credential added successfully",
+        "data": new_cred,
+    }
+
+
+@router.get("/llm-credentials", response_model=list[LLMCredentialOut])
+async def list_llm_credentials(
+    user=Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+):
+    creds = await db.execute(
+        select(LLMCredential).where(LLMCredential.user_id == user.id)
+    )
+    return creds.scalars().all()
+
+
+@router.post("/llm-select")
+async def select_llm_credential(
+    credential_id: int,
+    user=Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+):
+    cred = await db.get(LLMCredential, credential_id)
+    if not cred or cred.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Credential not found")
+    await set_selected_credential_id(user.username, credential_id)
+    return {"selected": credential_id}
+
+
+@router.get("/fetch-llm-providers")
+async def fetch_llm_providers(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    user=Depends(get_current_active_user),
+):
+    return {"providers": sorted(LLMProviders.get_providers())}
 
 
 @router.get("/validate-token")
-async def validate_token(request: Request, db: AsyncSession = Depends(get_db), user=Depends(get_current_active_user)):
+async def validate_token(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    user=Depends(get_current_active_user),
+):
     # If get_current_user does not raise, token is valid
     return {"valid": True, "username": user.username, "email": user.email}
 

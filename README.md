@@ -256,6 +256,7 @@ curl -X POST "http://localhost:8000/query" \
 - Generate a new migration after model changes:
 
   ```bash
+  cd backend
   alembic revision --autogenerate -m "describe_change"
   alembic upgrade head
   ```

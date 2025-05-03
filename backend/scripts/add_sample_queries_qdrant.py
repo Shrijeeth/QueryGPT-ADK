@@ -1,10 +1,11 @@
 import asyncio
 import json
 import uuid
-from qdrant_client import AsyncQdrantClient
-from qdrant_client.models import VectorParams, Distance
-from litellm import aembedding
+
 from config import get_settings
+from litellm import aembedding
+from qdrant_client import AsyncQdrantClient
+from qdrant_client.models import Distance, VectorParams
 
 
 async def main(sample_queries_file: str, qdrant_client: AsyncQdrantClient):

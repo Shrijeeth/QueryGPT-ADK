@@ -1,5 +1,6 @@
-from functools import lru_cache
 import os
+from functools import lru_cache
+
 from pydantic_settings import BaseSettings
 
 
@@ -26,6 +27,9 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     REDIS_URL: str = "redis://localhost:6379/1"
+    VAULT_ADDR: str = ""
+    VAULT_TOKEN: str = ""
+    VAULT_API_ENCRYPTION_KEY: str = ""
 
     class Config:
         env_file = ".env" if os.getenv("ENVIRONMENT") != "test" else None

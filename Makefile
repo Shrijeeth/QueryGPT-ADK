@@ -2,7 +2,10 @@ install:
 	python -m pip install -r requirements.txt
 
 lint:
-	python -m ruff check
+	python -m ruff check --select I,RUF022
+
+fix-lint:
+	python -m ruff check --select I,RUF022 --fix .
 
 format:
 	python -m ruff format

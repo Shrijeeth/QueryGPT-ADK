@@ -1,11 +1,12 @@
-from logging.config import fileConfig
-import sys
 import os
-from config import get_settings
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+import sys
+from logging.config import fileConfig
+
 from alembic import context
+from config import get_settings
 from models import Base
+from sqlalchemy import engine_from_config, pool
+
 # import Base and User from models package (Base is now unified)
 
 # this is the Alembic Config object, which provides

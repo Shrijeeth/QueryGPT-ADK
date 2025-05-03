@@ -1,8 +1,8 @@
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
-from routes import router
 from middleware.rate_limit import RateLimitMiddleware
+from routes import router
 
 app = FastAPI()
 app.add_middleware(RateLimitMiddleware)
