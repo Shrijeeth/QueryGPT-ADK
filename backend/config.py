@@ -29,7 +29,6 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/1"
     VAULT_ADDR: str = ""
     VAULT_TOKEN: str = ""
-    VAULT_API_ENCRYPTION_KEY: str = ""
 
     class Config:
         env_file = ".env" if os.getenv("ENVIRONMENT") != "test" else None
