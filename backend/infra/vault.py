@@ -4,7 +4,7 @@ import httpx
 from config import get_settings
 
 
-async def encrypt_api_data(text: str) -> dict:
+async def encrypt_vault_data(text: str) -> dict:
     vault_url = get_settings().VAULT_ADDR
     vault_token = get_settings().VAULT_TOKEN
     vault_encryption_key = get_settings().VAULT_API_ENCRYPTION_KEY

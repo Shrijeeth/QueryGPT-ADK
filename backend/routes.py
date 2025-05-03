@@ -36,82 +36,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from utils.helpers import parse_json_markdown
-from utils.types import LLMProviders
 
 router = APIRouter()
-
-
-# Helper to get Redis key for selected credential per user
-async def get_selected_credential_id(username: str) -> int | None:
-    key = f"user:{username}:selected_llm_credential"
-    value = await redis_client.get(key)
-    return int(value) if value else None
-
-
-async def set_selected_credential_id(username: str, cred_id: int):
-    key = f"user:{username}:selected_llm_credential"
-    await redis_client.set(key, cred_id)
-
-
-@router.post("/llm-credentials", response_model=LLMCredentialResponse)
-async def add_llm_credential(
-    cred: LLMCredentialCreate,
-    user=Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
-):
-    encrypted_api_key_response = await encrypt_api_data(cred.api_key)
-    encrypted_api_key = encrypted_api_key_response.get("data", {}).get(
-        "ciphertext", None
-    )
-    if not encrypted_api_key:
-        raise HTTPException(status_code=500, detail="Failed to encrypt API key")
-    new_cred = LLMCredential(
-        user_id=user.id,
-        api_key=encrypted_api_key,
-        provider=cred.provider.value,
-        label=cred.label,
-    )
-    db.add(new_cred)
-    await db.commit()
-    await db.refresh(new_cred)
-    return {
-        "success": True,
-        "message": "LLM credential added successfully",
-        "data": new_cred,
-    }
-
-
-@router.get("/llm-credentials", response_model=list[LLMCredentialOut])
-async def list_llm_credentials(
-    user=Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
-):
-    creds = await db.execute(
-        select(LLMCredential).where(LLMCredential.user_id == user.id)
-    )
-    return creds.scalars().all()
-
-
-@router.post("/llm-select")
-async def select_llm_credential(
-    credential_id: int,
-    user=Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
-):
-    cred = await db.get(LLMCredential, credential_id)
-    if not cred or cred.user_id != user.id:
-        raise HTTPException(status_code=404, detail="Credential not found")
-    await set_selected_credential_id(user.username, credential_id)
-    return {"selected": credential_id}
-
-
-@router.get("/fetch-llm-providers")
-async def fetch_llm_providers(
-    request: Request,
-    db: AsyncSession = Depends(get_db),
-    user=Depends(get_current_active_user),
-):
-    return {"providers": sorted(LLMProviders.get_providers())}
 
 
 @router.get("/validate-token")
