@@ -42,6 +42,15 @@ QueryGPT-ADK is an open-source, multi-agent system for natural language to SQL q
 - Database schema changes are managed using Alembic migrations. See `alembic/` for migration scripts.
 - Code is formatted and linted using `ruff`. Run `make lint` and `make format` to check and auto-fix code style.
 
+## Changelog
+
+### 2025-05-20
+
+- **PostgreSQL Support**: Added support for PostgreSQL alongside MySQL for query validation.
+- **SQL Validation Improvements**: Cleaned up JSON formatting and simplified SQL syntax validation in query formation prompts.
+- **Requirements Update**: Specified `psycopg2` package version as 2.9.10 in `requirements.txt`.
+- **Model/Migration Cleanup**: Removed `LLMCredential` model and related migrations.
+
 ## Installation
 
 ### Prerequisites
