@@ -1,5 +1,6 @@
 import os
 from functools import lru_cache
+from typing import Literal
 
 from pydantic_settings import BaseSettings
 
@@ -15,6 +16,7 @@ class Settings(BaseSettings):
     EMBEDDING_MODEL: str = ""
     EMBEDDING_API_KEY: str = ""
     EMBEDDING_SIZE: int = 768
+    VALIDATE_DB_TYPE: Literal["mysql", "postgresql"] = "mysql"
     VALIDATE_DB_HOST: str = ""
     VALIDATE_DB_PORT: int = 3306
     VALIDATE_DB_USER: str = ""

@@ -17,3 +17,4 @@ sqlalchemy[asyncio] ==2.0.40
 asyncpg==0.30.0
 greenlet==3.2.0
 redis==5.2.1
+psycopg2==2.9.10
