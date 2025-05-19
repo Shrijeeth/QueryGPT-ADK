@@ -16,21 +16,13 @@ from fastapi.security import OAuth2PasswordRequestForm
 from google.adk import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
-from infra.redis import redis_client
-from infra.vault import encrypt_api_data
 from middleware.account_lockout import (
     is_account_locked,
     record_failed_login,
     reset_failed_logins,
 )
-from models import LLMCredential
 from models import User as UserModel
 from pydantic import BaseModel, EmailStr
-from schemas.llm_credential_schemas import (
-    LLMCredentialCreate,
-    LLMCredentialOut,
-    LLMCredentialResponse,
-)
 from schemas.query_schemas import QueryRequest
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
