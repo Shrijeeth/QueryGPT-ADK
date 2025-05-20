@@ -56,7 +56,6 @@ QueryGPT-ADK is an open-source, multi-agent system for natural language to SQL q
 ### Prerequisites
 
 - [Python 3.9+](https://www.python.org/downloads/)
-- [MySQL database](https://www.mysql.com/) (for query validation)
 - [Qdrant](https://qdrant.tech/) vector database
 - [Redis](https://redis.io/) (for rate limiting and account lockout)
 - [Next.js](https://nextjs.org/) (for UI)
