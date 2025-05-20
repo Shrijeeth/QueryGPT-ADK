@@ -352,22 +352,22 @@ curl -X POST "http://localhost:8000/query" \
 
 ### Next.js UI (In Progress)
 
-- Build a modern Next.js web app for natural-language-to-SQL interactions.
-- Provide a user-friendly interface for entering queries and viewing generated SQL and results.
-- Display results in interactive, filterable tables.
-- Add authentication, query history, and user profile management.
-- Integrate responsive design and accessibility best practices.
-- Enable seamless communication with the FastAPI backend via REST API.
+- Build a modern Next.js web app for natural-language-to-SQL interactions. (Completed)
+- Provide a user-friendly interface for entering queries and viewing generated SQL and results. (Completed)
+- Display results in interactive, filterable tables. (To Do)
+- Add authentication, query history, and user profile management. (In Progress)
+- Integrate responsive design and accessibility best practices. (To Do)
+- Enable seamless communication with the FastAPI backend via REST API. (Completed)
 
 ### FastAPI Backend (In Progress)
 
-- Develop REST API endpoints for query submission, execution, and validation.
-- Implement CORS, rate limiting, and token-based authentication.
-- Establish database connectivity and connection pooling.
-- Provide interactive OpenAPI documentation via Swagger UI.
-- Write unit and integration tests for API endpoints.
+- Develop REST API endpoints for query submission, execution, and validation. (Completed)
+- Implement CORS, rate limiting, and token-based authentication. (Completed)
+- Establish database connectivity and connection pooling. (Completed)
+- Provide interactive OpenAPI documentation via Swagger UI. (Completed)
+- Write unit and integration tests for API endpoints. (To Do)
 
-### BYOK & Model Provider Support (To Do)
+### BYOK & Model Provider Support (Completed)
 
 - Add support for BYOK (Bring Your Own Key/Model) to allow users to plug in their preferred LLM provider (e.g., OpenAI, Gemini, Ollama, Azure, local models, etc.).
 - Provide a configuration interface for selecting and managing model providers.
