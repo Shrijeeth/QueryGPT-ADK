@@ -388,6 +388,13 @@ curl -X POST "http://localhost:8000/query" \
 - Enable schema and collection import for semantic search and retrieval.
 - Ensure integration of custom vector DBs with agentic workflow and query tools.
 
+### Generate Synthetic Data for a Database (To Do)
+
+- Add support for generating synthetic data for a given database.
+- Provide a UI and/or CLI for users to generate synthetic data for their own database.
+- Create an agent that can generate synthetic data queries for a given database.
+- Add scripts to generate synthetic data and fetch schema for a given database.
+
 ### Testing (To Do)
 
 - Write test cases for agentic workflow (end-to-end and agent interaction tests).
