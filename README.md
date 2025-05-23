@@ -21,6 +21,11 @@ QueryGPT-ADK is an open-source, multi-agent system for natural language to SQL q
 
 - Natural Language to SQL: Converts user questions into SQL queries using LLM-based agents.
 - Multi-Agent Architecture: Modular agents for query formation, explanation, table/column selection, and validation.
+- **Automatic Schema Extraction & Table Description:**
+  - New agent (`sql_table_describer_agent`) for extracting and describing SQL table schemas, including sub-agents for table-level tasks.
+  - Includes a script to auto-generate JSON documentation of all tables, views, and enums from your database (`generate_tables_json.py`).
+- Robust SQL Query Validation: Ensures only valid SELECT statements are executed, supporting both MySQL and PostgreSQL.
+
 - Vector Search Integration: Uses Qdrant for semantic search over sample queries and table schemas.
 - Validation: Ensures only valid SELECT queries are generated and executed.
 - **Production-Ready Security:**
@@ -43,6 +48,12 @@ QueryGPT-ADK is an open-source, multi-agent system for natural language to SQL q
 - Code is formatted and linted using `ruff`. Run `make lint` and `make format` to check and auto-fix code style.
 
 ## Changelog
+
+### 2025-05-23
+- Added `sql_table_describer_agent` for automated SQL table schema extraction and description.
+- Introduced `backend/scripts/generate_tables_json.py` for generating up-to-date JSON documentation of all database tables, views, and enums.
+- Enhanced SQL query validation tools to support both MySQL and PostgreSQL, with improved error handling.
+- Updated configuration and helper utilities for multi-database and LLM support.
 
 ### 2025-05-20
 
@@ -92,7 +103,16 @@ POSTGRES_DB_URL=postgresql+asyncpg://user:password@localhost:5432/querygpt
 REDIS_URL=redis://localhost:6379/1
 ```
 
-4. Set up environment variables (Frontend):
+4. Generate up-to-date table and enum documentation (Backend):
+
+```bash
+cd backend
+python -m scripts.generate_tables_json
+```
+
+This command will connect to your configured database and auto-generate the latest tables, views, and enums documentation in `backend/scripts/data/tables.json`. Before running this command, make sure your database is up and running and the connection string in `.env` is correct for validation database. You also need LLM provider and API key for this command to work. Set `SYNTHETIC_DATA_LLM_MODEL` and `SYNTHETIC_DATA_LLM_API_KEY` in `.env` for this to work.
+
+5. Set up environment variables (Frontend):
 
 ```bash
 cd frontend
@@ -105,7 +125,7 @@ Edit `.env` and set your API base URL as needed. Example:
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 ```
 
-5. Set up the Frontend (Next.js UI):
+6. Set up the Frontend (Next.js UI):
 
 ```bash
 cd frontend
@@ -116,14 +136,14 @@ npm run dev
 
 This will start the frontend at [http://localhost:3000](http://localhost:3000).
 
-6. Clear Qdrant database (Optional):
+7. Clear Qdrant database (Optional):
 
 ```bash
 cd backend
 python scripts/clear_vector_db.py
 ```
 
-7. Load db data into Qdrant:
+8. Load db data into Qdrant:
 
 ```bash
 cd backend
@@ -131,7 +151,7 @@ python scripts/add_table_schemas.py
 python scripts/add_sample_queries_qdrant.py
 ```
 
-8. (Optional) Use Your Own Data:
+9. (Optional) Use Your Own Data:
 
 To use QueryGPT-ADK with your own data, replace the provided `sample_queries.json` and `tables.json` files in the `backend/scripts/data/` directory with your own files. Make sure your files follow the same structure as the samples. Then, rerun the data loading scripts:
 
@@ -388,7 +408,7 @@ curl -X POST "http://localhost:8000/query" \
 - Enable schema and collection import for semantic search and retrieval.
 - Ensure integration of custom vector DBs with agentic workflow and query tools.
 
-### Generate Synthetic Data for a Database (To Do)
+### Generate Synthetic Data for a Database (In Progress)
 
 - Add support for generating synthetic data for a given database.
 - Provide a UI and/or CLI for users to generate synthetic data for their own database.

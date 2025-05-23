@@ -1,58 +1,39 @@
-import mysql.connector
-import psycopg2
 from config import get_settings
 from google.adk.tools import FunctionTool
 from mysql.connector import Error as MySQLError
 from psycopg2 import Error as PostgresError
+from utils.helpers import (
+    get_validate_db_mysql_connection,
+    get_validate_db_postgres_connection,
+)
 
 
-def validate_sql_query_mysql(query: str) -> dict:
-    conn = mysql.connector.connect(
-        host=get_settings().VALIDATE_DB_HOST,
-        port=get_settings().VALIDATE_DB_PORT,
-        user=get_settings().VALIDATE_DB_USER,
-        password=get_settings().VALIDATE_DB_PASSWORD,
-        database=get_settings().VALIDATE_DB_DATABASE,
-        autocommit=False,
-    )
-    cursor = conn.cursor()
+def validate_sql_query_mysql(query: str) -> tuple[dict, object]:
+    conn, cursor = get_validate_db_mysql_connection()
     query_type = query.strip().split()[0].upper()
 
     if query_type == "SELECT":
         try:
             cursor.execute(f"EXPLAIN {query}")
-            conn.close()
-            return {"valid": "true", "error": ""}
+            return {"valid": "true", "error": ""}, conn
         except MySQLError as e:
-            conn.close()
-            return {"valid": "false", "error": str(e)}
+            return {"valid": "false", "error": str(e)}, conn
     else:
-        conn.close()
-        return {"valid": "false", "error": "Only SELECT statements are allowed"}
+        return {"valid": "false", "error": "Only SELECT statements are allowed"}, conn
 
 
-def validate_sql_query_postgres(query: str) -> dict:
-    conn = psycopg2.connect(
-        host=get_settings().VALIDATE_DB_HOST,
-        port=get_settings().VALIDATE_DB_PORT,
-        user=get_settings().VALIDATE_DB_USER,
-        password=get_settings().VALIDATE_DB_PASSWORD,
-        database=get_settings().VALIDATE_DB_DATABASE,
-    )
-    cursor = conn.cursor()
+def validate_sql_query_postgres(query: str) -> tuple[dict, object]:
+    conn, cursor = get_validate_db_postgres_connection()
     query_type = query.strip().split()[0].upper()
 
     if query_type == "SELECT":
         try:
             cursor.execute(f"EXPLAIN {query}")
-            conn.close()
-            return {"valid": "true", "error": ""}
+            return {"valid": "true", "error": ""}, conn
         except PostgresError as e:
-            conn.close()
-            return {"valid": "false", "error": str(e)}
+            return {"valid": "false", "error": str(e)}, conn
     else:
-        conn.close()
-        return {"valid": "false", "error": "Only SELECT statements are allowed"}
+        return {"valid": "false", "error": "Only SELECT statements are allowed"}, conn
 
 
 def validate_sql_query(query: str) -> dict:
@@ -67,15 +48,20 @@ def validate_sql_query(query: str) -> dict:
     Returns:
         dict: A dictionary containing the validation result (valid: bool) and error message (error: str)
     """
+    conn = None
     try:
         if get_settings().VALIDATE_DB_TYPE == "mysql":
-            return validate_sql_query_mysql(query)
+            result, conn = validate_sql_query_mysql(query)
         elif get_settings().VALIDATE_DB_TYPE == "postgresql":
-            return validate_sql_query_postgres(query)
+            result, conn = validate_sql_query_postgres(query)
         else:
             return {"valid": "false", "error": "Unsupported database type"}
+        return result
     except Exception as e:
         return {"valid": "false", "error": str(e)}
+    finally:
+        if conn:
+            conn.close()
 
 
 validate_sql_query_tool = FunctionTool(

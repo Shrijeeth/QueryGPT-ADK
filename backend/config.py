@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/1"
     VAULT_ADDR: str = ""
     VAULT_TOKEN: str = ""
+    SYNTHETIC_DATA_LLM_MODEL: str = ""
+    SYNTHETIC_DATA_LLM_API_KEY: str = ""
+    SYNTHETIC_DATA_LLM_TEMPERATURE: float = 0.2
 
     class Config:
         env_file = ".env" if os.getenv("ENVIRONMENT") != "test" else None

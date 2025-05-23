@@ -13,6 +13,9 @@ format:
 upsert-data:
 	cd backend && python -m scripts.clear_vector_db && python -m scripts.add_sample_queries_qdrant && python -m scripts.add_table_schemas
 
+generate-data:
+	cd backend && python -m scripts.generate_tables_json
+
 run-backend:
 	cd backend && uvicorn main:app --port 8000
 
