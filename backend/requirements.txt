@@ -1,0 +1,20 @@
+adktools==0.1.2
+google-adk==1.0.0
+pydantic[email]==2.11.3
+pydantic_settings==2.9.1
+fastapi==0.115.12
+uvicorn==0.34.1
+python-dotenv==1.1.0
+ruff==0.11.6
+qdrant-client==1.13.3
+litellm==1.70.2
+mysql-connector-python==9.3.0
+python-multipart==0.0.20
+python-jose==3.4.0
+bcrypt==4.0.1
+passlib[bcrypt]==1.7.4
+sqlalchemy[asyncio] ==2.0.40
+asyncpg==0.30.0
+greenlet==3.2.0
+redis==5.2.1
+psycopg2==2.9.10
