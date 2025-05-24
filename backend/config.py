@@ -34,6 +34,7 @@ class Settings(BaseSettings):
     SYNTHETIC_DATA_LLM_MODEL: str = ""
     SYNTHETIC_DATA_LLM_API_KEY: str = ""
     SYNTHETIC_DATA_LLM_TEMPERATURE: float = 0.2
+    MAX_SYNTHETIC_DATA_POINTS: int = 10
 
     class Config:
         env_file = ".env" if os.getenv("ENVIRONMENT") != "test" else None

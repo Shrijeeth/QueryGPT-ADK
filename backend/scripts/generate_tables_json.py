@@ -135,6 +135,11 @@ async def main():
 
     # Setup ADK session
     session_service = InMemorySessionService()
+    await session_service.create_session(
+        app_name="sql_table_describer_agent",
+        user_id="user",
+        session_id="user-session",
+    )
     runner = Runner(
         agent=root_agent,
         app_name="sql_table_describer_agent",
