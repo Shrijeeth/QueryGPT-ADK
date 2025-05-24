@@ -1,14 +1,17 @@
-install:
-	python -m pip install -r requirements.txt
+install-backend:
+	cd backend && python -m pip install -r requirements.txt
 
-lint:
-	python -m ruff check
+install-frontend:
+	cd frontend && npm install
 
-fix-lint:
-	python -m ruff check --select I,RUF022 --fix .
+lint-backend:
+	cd backend && python -m ruff check
 
-format:
-	python -m ruff format
+fix-lint-backend:
+	cd backend && python -m ruff check --select I,RUF022 --fix .
+
+format-backend:
+	cd backend && python -m ruff format
 
 upsert-data:
 	cd backend && python -m scripts.clear_vector_db && python -m scripts.add_sample_queries_qdrant && python -m scripts.add_table_schemas
