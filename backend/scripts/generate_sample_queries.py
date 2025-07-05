@@ -2,10 +2,11 @@ import asyncio
 import json
 import os
 
-from agents.sql_data_generation_agent.agent import root_agent
 from google.adk import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
+
+from agents.sql_data_generation_agent.agent import root_agent
 from utils.helpers import parse_json_markdown
 
 

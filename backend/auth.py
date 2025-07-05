@@ -1,17 +1,18 @@
 from datetime import datetime, timedelta
 from typing import Optional
 
-from config import get_settings
-from database import get_db
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from models import User as UserModel
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+
+from config import get_settings
+from database import get_db
+from models import User as UserModel
 
 # Secret key and algorithm for JWT
 SECRET_KEY = get_settings().JWT_SECRET_KEY

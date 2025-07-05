@@ -1,10 +1,11 @@
 import json
 
-from config import get_settings
 from google.adk.tools import FunctionTool
 from litellm import embedding
 from qdrant_client import QdrantClient
 from qdrant_client.models import FieldCondition, Filter, MatchValue
+
+from config import get_settings
 
 
 def get_similar_queries(user_input: str, score_threshold: float = 0.3) -> str:

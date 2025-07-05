@@ -2,10 +2,11 @@ import asyncio
 import json
 import uuid
 
-from config import get_settings
 from litellm import aembedding
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.models import Distance, VectorParams
+
+from config import get_settings
 
 
 async def main(tables_file: str, qdrant_client: AsyncQdrantClient):
@@ -30,6 +31,11 @@ async def main(tables_file: str, qdrant_client: AsyncQdrantClient):
                 size=get_settings().EMBEDDING_SIZE,
                 distance=Distance.COSINE,
             ),
+        )
+        await qdrant_client.create_payload_index(
+            collection_name=get_settings().QDRANT_COLLECTION_NAME,
+            field_name="type",
+            field_schema="keyword",
         )
 
     points = []

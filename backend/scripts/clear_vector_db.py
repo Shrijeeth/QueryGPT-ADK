@@ -1,7 +1,8 @@
 import asyncio
 
-from config import get_settings
 from qdrant_client import AsyncQdrantClient
+
+from config import get_settings
 
 
 async def main():

@@ -1,10 +1,11 @@
 import json
 
-from config import get_settings
 from google.adk.tools import FunctionTool
 from litellm import embedding
 from qdrant_client import QdrantClient
 from qdrant_client.models import FieldCondition, Filter, MatchValue
+
+from config import get_settings
 
 
 def get_similar_tables(
@@ -37,11 +38,15 @@ def get_similar_tables(
         collection_name=get_settings().QDRANT_COLLECTION_NAME,
         query=embed.data[0].embedding,
         query_filter=Filter(
-            must=[
+            should=[
                 FieldCondition(
                     key="type",
                     match=MatchValue(value="TABLE"),
-                )
+                ),
+                FieldCondition(
+                    key="type",
+                    match=MatchValue(value="VIEW"),
+                ),
             ]
         ),
         score_threshold=score_threshold,

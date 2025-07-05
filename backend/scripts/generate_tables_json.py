@@ -1,11 +1,12 @@
 import asyncio
 import os
 
-from agents.sql_table_describer_agent.agent import root_agent
-from config import get_settings
 from google.adk import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
+
+from agents.sql_table_describer_agent.agent import root_agent
+from config import get_settings
 from utils.helpers import (
     get_validate_db_mysql_connection,
     get_validate_db_postgres_connection,

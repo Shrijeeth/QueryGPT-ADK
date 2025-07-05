@@ -1,9 +1,10 @@
 import time
 
 from fastapi import Request, status
-from infra.redis import redis_client
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
+
+from infra.redis import redis_client
 
 RATE_LIMIT = 20  # max requests
 RATE_PERIOD = 60  # per 60 seconds

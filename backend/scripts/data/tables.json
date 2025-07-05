@@ -2,49 +2,49 @@
     "data": [
         {
             "name": "medicine_issues",
-            "description": "This table records each instance of medicine being issued to patients. It keeps track of which patient received which medicine, the quantity issued, the date of issue, and any additional remarks.",
+            "description": "Records the issuance of medicines to patients, including patient and medicine details, quantity issued, issue date, and remarks.",
             "schema": "CREATE TABLE \"medicine_issues\" (\n  \"id\" bigint unsigned NOT NULL AUTO_INCREMENT,\n  \"patient_id\" int DEFAULT NULL,\n  \"medicine_id\" int DEFAULT NULL,\n  \"quantity\" int DEFAULT NULL,\n  \"issue_date\" date NOT NULL,\n  \"remarks\" text,\n  PRIMARY KEY (\"id\"),\n  UNIQUE KEY \"id\" (\"id\"),\n  CONSTRAINT \"medicine_issues_chk_1\" CHECK ((`quantity` > 0))\n)",
             "type": "TABLE"
         },
         {
             "name": "medicines",
-            "description": "This table maintains details about the medicines available including their name, brand, category, unit of measure, and timestamps for when the record was created or last updated.",
+            "description": "Contains detailed information about medicines such as name, brand, category, unit of measurement, and timestamps for record creation and updates.",
             "schema": "CREATE TABLE \"medicines\" (\n  \"id\" bigint unsigned NOT NULL AUTO_INCREMENT,\n  \"name\" varchar(255) NOT NULL,\n  \"brand\" varchar(255) DEFAULT NULL,\n  \"category\" varchar(100) DEFAULT NULL,\n  \"unit\" varchar(50) DEFAULT NULL,\n  \"created_at\" timestamp NULL DEFAULT CURRENT_TIMESTAMP,\n  \"updated_at\" timestamp NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (\"id\"),\n  UNIQUE KEY \"id\" (\"id\")\n)",
             "type": "TABLE"
         },
         {
             "name": "patients",
-            "description": "This table contains demographic information about patients such as their full name, date of birth, and gender.",
+            "description": "Maintains patient information including full name, date of birth, and gender.",
             "schema": "CREATE TABLE \"patients\" (\n  \"id\" bigint unsigned NOT NULL AUTO_INCREMENT,\n  \"full_name\" varchar(255) DEFAULT NULL,\n  \"dob\" date DEFAULT NULL,\n  \"gender\" varchar(10) DEFAULT NULL,\n  PRIMARY KEY (\"id\"),\n  UNIQUE KEY \"id\" (\"id\")\n)",
             "type": "TABLE"
         },
         {
             "name": "stock_balance",
-            "description": "This is a view summarizing the stock status of medicines by calculating total stock credited and debited, and the resulting balance for each medicine.",
+            "description": "A database view that provides the current stock balance for each medicine by calculating total credits minus total debits to show available quantities.",
             "schema": "CREATE VIEW \"stock_balance\" AS select \"m\".\"id\" AS \"medicine_id\",\"m\".\"name\" AS \"name\",coalesce(sum(\"sc\".\"quantity\"),0) AS \"total_credit\",coalesce(sum(\"sd\".\"quantity\"),0) AS \"total_debit\",(coalesce(sum(\"sc\".\"quantity\"),0) - coalesce(sum(\"sd\".\"quantity\"),0)) AS \"balance\" from ((\"medicines\" \"m\" left join \"stock_credit\" \"sc\" on((\"sc\".\"medicine_id\" = \"m\".\"id\"))) left join \"stock_debit\" \"sd\" on((\"sd\".\"medicine_id\" = \"m\".\"id\"))) group by \"m\".\"id\",\"m\".\"name\"",
             "type": "VIEW"
         },
         {
             "name": "stock_credit",
-            "description": "This table tracks medicine stock additions (credits) specifying medicine, quantity, price per unit, credit date, supplier, note, and the user responsible for the record.",
+            "description": "Logs additions to medicine stock with details on medicine ID, quantity added, price per unit, credit date, supplier info, and the user who recorded the entry.",
             "schema": "CREATE TABLE \"stock_credit\" (\n  \"id\" bigint unsigned NOT NULL AUTO_INCREMENT,\n  \"medicine_id\" int DEFAULT NULL,\n  \"quantity\" int NOT NULL,\n  \"price_per_unit\" decimal(10,2) DEFAULT NULL,\n  \"credit_date\" date NOT NULL,\n  \"note\" text,\n  \"supplier_id\" int DEFAULT NULL,\n  \"created_by\" int DEFAULT NULL,\n  \"created_at\" timestamp NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (\"id\"),\n  UNIQUE KEY \"id\" (\"id\"),\n  CONSTRAINT \"stock_credit_chk_1\" CHECK ((`quantity` > 0))\n)",
             "type": "TABLE"
         },
         {
             "name": "stock_debit",
-            "description": "This table records medicine stock removals (debits), detailing the medicine, quantity, date of removal, notes, the patient to whom the stock was issued, and the user responsible.",
+            "description": "Records reductions in medicine stock, noting the medicine involved, quantity issued, debit date, patient ID receiving the medicine, notes, and the user who processed it.",
             "schema": "CREATE TABLE \"stock_debit\" (\n  \"id\" bigint unsigned NOT NULL AUTO_INCREMENT,\n  \"medicine_id\" int DEFAULT NULL,\n  \"quantity\" int NOT NULL,\n  \"debit_date\" date NOT NULL,\n  \"note\" text,\n  \"issued_to_patient_id\" int DEFAULT NULL,\n  \"created_by\" int DEFAULT NULL,\n  \"created_at\" timestamp NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (\"id\"),\n  UNIQUE KEY \"id\" (\"id\"),\n  CONSTRAINT \"stock_debit_chk_1\" CHECK ((`quantity` > 0))\n)",
             "type": "TABLE"
         },
         {
             "name": "suppliers",
-            "description": "This table stores information about suppliers of medicines including their name, contact details, and address.",
+            "description": "Stores information about medicine suppliers including their name, contact information, and address.",
             "schema": "CREATE TABLE \"suppliers\" (\n  \"id\" bigint unsigned NOT NULL AUTO_INCREMENT,\n  \"name\" varchar(255) NOT NULL,\n  \"contact\" varchar(100) DEFAULT NULL,\n  \"address\" text,\n  PRIMARY KEY (\"id\"),\n  UNIQUE KEY \"id\" (\"id\")\n)",
             "type": "TABLE"
         },
         {
             "name": "users",
-            "description": "This table contains information about system users such as their full name, role, and email address.",
+            "description": "Contains information about users of the system including their full name, role, and email address.",
             "schema": "CREATE TABLE \"users\" (\n  \"id\" bigint unsigned NOT NULL AUTO_INCREMENT,\n  \"full_name\" varchar(255) DEFAULT NULL,\n  \"role\" varchar(50) DEFAULT NULL,\n  \"email\" varchar(100) DEFAULT NULL,\n  PRIMARY KEY (\"id\"),\n  UNIQUE KEY \"id\" (\"id\")\n)",
             "type": "TABLE"
         }

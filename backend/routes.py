@@ -1,6 +1,16 @@
 import time
 from datetime import timedelta
 
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.security import OAuth2PasswordRequestForm
+from google.adk import Runner
+from google.adk.sessions import InMemorySessionService
+from google.genai import types
+from pydantic import BaseModel, EmailStr
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+
 from agents.query_agent.agent import root_agent
 from auth import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
@@ -11,22 +21,13 @@ from auth import (
     get_password_hash,
 )
 from database import get_db
-from fastapi import APIRouter, Depends, HTTPException, Request, status
-from fastapi.security import OAuth2PasswordRequestForm
-from google.adk import Runner
-from google.adk.sessions import InMemorySessionService
-from google.genai import types
 from middleware.account_lockout import (
     is_account_locked,
     record_failed_login,
     reset_failed_logins,
 )
 from models import User as UserModel
-from pydantic import BaseModel, EmailStr
 from schemas.query_schemas import QueryRequest
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
 from utils.helpers import parse_json_markdown
 
 router = APIRouter()
@@ -74,7 +75,7 @@ async def login(
 async def run_query(request: QueryRequest, user=Depends(get_current_active_user)):
     # Setup ADK session
     session_service = InMemorySessionService()
-    session = session_service.create_session(
+    session = await session_service.create_session(
         app_name="QueryApp",
         user_id=user.username,
         session_id=f"{user.username}-session",
