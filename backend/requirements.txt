@@ -7,7 +7,7 @@ uvicorn==0.34.1
 python-dotenv==1.1.0
 ruff==0.11.6
 qdrant-client==1.13.3
-litellm==1.70.2
+litellm==1.68.0
 mysql-connector-python==9.3.0
 python-multipart==0.0.20
 python-jose==3.4.0
@@ -18,3 +18,8 @@ asyncpg==0.30.0
 greenlet==3.2.0
 redis==5.2.1
 psycopg2==2.9.10
+crewai-tools==0.46.0
+matplotlib==3.10.3
+seaborn==0.13.2
+pandas==2.2.3
+numpy==2.2.4

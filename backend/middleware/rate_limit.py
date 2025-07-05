@@ -5,7 +5,7 @@ from infra.redis import redis_client
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 
-RATE_LIMIT = 5  # max requests
+RATE_LIMIT = 20  # max requests
 RATE_PERIOD = 60  # per 60 seconds
 
 
