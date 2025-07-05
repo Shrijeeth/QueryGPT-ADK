@@ -99,7 +99,7 @@ async def run_query(request: QueryRequest, user=Depends(get_current_active_user)
         raise HTTPException(
             status_code=400, detail="Failed to parse JSON response or invalid query"
         )
-    session = runner.session_service.get_session(
+    session = await runner.session_service.get_session(
         app_name="QueryApp",
         user_id=user.username,
         session_id=f"{user.username}-session",
