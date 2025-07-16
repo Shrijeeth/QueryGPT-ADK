@@ -4,10 +4,11 @@ from fastapi import Request, status
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 
+from config import get_settings
 from infra.redis import redis_client
 
-RATE_LIMIT = 20  # max requests
-RATE_PERIOD = 60  # per 60 seconds
+RATE_LIMIT = get_settings().API_RATE_LIMIT  # max requests
+RATE_PERIOD = get_settings().API_RATE_PERIOD  # per 60 seconds
 
 
 def get_remote_ip(request: Request):
