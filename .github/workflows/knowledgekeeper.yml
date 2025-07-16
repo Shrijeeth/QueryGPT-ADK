@@ -1,0 +1,93 @@
+name: Knowledge Keeper Structured Commits
+
+on:
+  push:
+    branches:
+      - main
+  
+jobs:
+  send-diff-metadata:
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v3
+          with:
+            fetch-depth: 0
+
+        - name: Install jq
+          run: sudo apt-get update && sudo apt-get install -y jq
+
+        - name: Send structured commit metadata to webhook
+          run: |
+            echo "🔄 Generating structured commit diff payload..."
+
+            payload='{"connection_type": "GITHUB", "repository_connection_id": 23, "source_data": ['
+            sep=""
+
+            set +e
+            shas=$(git rev-list --no-merges "${{ github.event.before }}..${{ github.event.after }}" 2>/dev/null)
+            set -e
+
+            if [ -z "$shas" ]; then
+                echo "⚠️ Empty or invalid revision range. Falling back to last 5 commits."
+                shas=$(git rev-list -n 5 HEAD)
+            fi
+
+            for sha in $shas; do
+                commit_msg=$(git log -1 --pretty=format:"%s" "$sha")
+                file_changes="[]"
+
+                while IFS=$'\t' read -r added removed file; do
+                [ -z "$file" ] && continue
+
+                if [ "$added" -eq 0 ] && [ "$removed" -gt 0 ]; then
+                    change_type="deleted"
+                elif [ "$removed" -eq 0 ] && [ "$added" -gt 0 ]; then
+                    change_type="added"
+                else
+                    change_type="modified"
+                fi
+
+                summary="$file: $added additions, $removed deletions"
+
+                if [ "$change_type" != "deleted" ]; then
+                    diff_info=$(git diff --unified=1 "$sha^" "$sha" -- "$file" | grep -v "^@@" | grep -v "^index" | grep -v "^diff" | grep -v "^---" | grep -v "^+++")
+                    if [ -n "$diff_info" ]; then
+                    diff_info_escaped=$(echo "$diff_info" | jq -Rs .)
+                    else
+                    diff_info_escaped="\"\""
+                    fi
+                else
+                    diff_info_escaped="\"\""
+                fi
+
+                file_change=$(jq -n                     --arg path "$file"                     --arg type "$change_type"                     --arg added "$added"                     --arg removed "$removed"                     --arg summary "$summary"                     --argjson changes "$diff_info_escaped"                     '{
+                    file_path: $path,
+                    change_type: $type,
+                    additions: ($added | tonumber? // 0),
+                    deletions: ($removed | tonumber? // 0),
+                    diff_summary: $summary,
+                    changes_preview: $changes
+                    }')
+
+                file_changes=$(echo "$file_changes" | jq ". + [$file_change]")
+                done < <(git show --numstat --oneline "$sha")
+
+                commit_block=$(jq -n                 --arg id "$sha"                 --arg msg "$commit_msg"                 --argjson files "$file_changes"                 '{
+                    commit_message: $msg,
+                    commit_id: $id,
+                    file_changes: $files
+                }')
+
+                payload="${payload}${sep}${commit_block}"
+                sep=","
+            done
+
+            payload="${payload}]}"
+            echo "✅ Final Payload:"
+            echo "$payload" | jq .
+
+            curl -X POST https://api-core.knowledgekeeper.ai/api/v1/webhooks/git \
+                -H "x-api-key: 6234a77c99776de3278615469b9e9960d3153a51b49b8fdabd7b9b897e3f30d0" \
+                -H "Content-Type: application/json" \
+                -d "$payload"
+  
