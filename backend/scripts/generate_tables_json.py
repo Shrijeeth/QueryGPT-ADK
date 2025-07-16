@@ -136,7 +136,7 @@ async def main():
 
     # Setup ADK session
     session_service = InMemorySessionService()
-    session_service.create_session(
+    await session_service.create_session(
         app_name="sql_table_describer_agent",
         user_id="user",
         session_id="user-session",

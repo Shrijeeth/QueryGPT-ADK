@@ -17,7 +17,7 @@ async def main():
 
     sample_queries = []
     session_service = InMemorySessionService()
-    session_service.create_session(
+    await session_service.create_session(
         app_name="sql_data_generation_agent",
         user_id="user",
         session_id="user-session",
