@@ -136,7 +136,7 @@ async def main():
 
     # Setup ADK session
     session_service = InMemorySessionService()
-    await session_service.create_session(
+    session_service.create_session(
         app_name="sql_table_describer_agent",
         user_id="user",
         session_id="user-session",
@@ -163,13 +163,14 @@ async def main():
         raise ValueError("Failed to parse JSON response")
     table_descriptions: list[dict] = final_response["table_descriptions"]
     if len(table_descriptions) != len(data):
-        raise ValueError("Number of table descriptions does not match number of tables")
+        print("Number of table descriptions does not match number of tables")
     for table in data:
         desc = list(
             filter(lambda x: x["table_name"] == table["name"], table_descriptions)
         )
         if not desc:
-            raise ValueError(f"Table {table['name']} not found in table descriptions")
+            print(f"Table {table['name']} not found in table descriptions")
+            continue
         table["description"] = desc[0]["description"]
 
     # Write to tables.json

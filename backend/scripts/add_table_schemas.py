@@ -43,7 +43,7 @@ async def main(tables_file: str, qdrant_client: AsyncQdrantClient):
         points.append(
             {
                 "id": str(uuid.uuid4()),
-                "vector": embed.embedding,
+                "vector": embed["embedding"],
                 "payload": tables["data"][i],
             }
         )

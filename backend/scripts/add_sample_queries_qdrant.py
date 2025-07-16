@@ -43,7 +43,7 @@ async def main(sample_queries_file: str, qdrant_client: AsyncQdrantClient):
         points.append(
             {
                 "id": str(uuid.uuid4()),
-                "vector": embed.embedding,
+                "vector": embed["embedding"],
                 "payload": sample_queries["data"][i],
             }
         )
