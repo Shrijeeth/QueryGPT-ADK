@@ -20,7 +20,7 @@ jobs:
           run: |
             echo "🔄 Generating structured commit diff payload..."
 
-            payload='{"connection_type": "GITHUB", "repository_connection_id": 32, "source_data": ['
+            payload='{"connection_type": "GITHUB", "repository_connection_id": 39, "source_data": ['
             sep=""
 
             set +e
@@ -87,7 +87,7 @@ jobs:
             echo "$payload" | jq .
 
             curl -X POST https://api-core-develop.knowledgekeeper.ai/api/v1/webhooks/git \
-                -H "x-api-key: 2705e7f31dc29085ddef64692a6f872c42cd465fa288cc7f1d674710bf8fe761" \
+                -H "x-api-key: 7a01a5d07ffe9f74dee0c99e2d14716fd09b75c63233957e3274b975d78cb69a" \
                 -H "Content-Type: application/json" \
                 -d "$payload"
   
